@@ -372,11 +372,6 @@ GET /api/health
 
 For local development, the system includes JWT bypass functionality that automatically authenticates requests with a mock admin user when `APP_ENV=local` and `APP_DEBUG=true`.
 
-#### Quick Development Test
-```bash
-# Test the system without authentication
-php test-dev-system.php
-```
 
 #### Test Protected Endpoints Without Authentication
 ```bash
@@ -481,11 +476,6 @@ curl http://localhost:8000/api/health
    - `password`: password123
    - `password_confirmation`: password123
 
-### Testing CRUD Operations
-```bash
-# Test all CRUD operations
-php test-crud-operations.php
-```
 
 ## Development Notes
 
@@ -542,13 +532,13 @@ The system includes a development bypass that automatically authenticates reques
    - Implement API response caching
    
    
-# ðŸ” JWT Control Guide
+# JWT Control Guide
 
 ## Overview
 
 Your microservices system supports multiple ways to control JWT authentication between development and production modes. This guide explains all the methods available.
 
-## ðŸŽ¯ Control Methods
+## Control Methods
 
 ### Method 1: Interactive Control Script (Easiest)
 
@@ -610,7 +600,7 @@ The system checks JWT bypass in this order:
    if (env('JWT_BYPASS', false))
    ```
 
-## ðŸš€ Quick Commands
+## Quick Commands
 
 ### Switch to Development Mode
 ```bash
@@ -634,13 +624,7 @@ echo APP_DEBUG=false >> .env
 echo JWT_BYPASS=false >> .env
 ```
 
-### Test Current Mode
-```bash
-# Test JWT configuration
-php test-jwt-modes.php
-```
-
-## ðŸ”§ Configuration Options
+## Configuration Options
 
 ### JWT Configuration (config/jwt.php)
 ```php
@@ -674,13 +658,7 @@ return [
 | `JWT_MOCK_USER_EMAIL` | Mock user email | `dev@localhost.com` | `test@example.com` |
 | `JWT_MOCK_USER_ROLE` | Mock user role | `admin` | `user`, `moderator`, `admin`, `superadmin` |
 
-## ðŸ§ª Testing JWT Modes
 
-### Test Script
-```bash
-# Run comprehensive JWT mode test
-php test-jwt-modes.php
-```
 
 ### Manual Testing
 
@@ -702,25 +680,22 @@ curl http://localhost:8000/api/orders         # Returns 401
 curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profile
 ```
 
-## ðŸ”„ Switching Between Modes
+## Switching Between Modes
 
 ### For Development
 1. Run `jwt-control.bat`
 2. Choose option 1 (Development Mode)
-3. Test with `php test-jwt-modes.php`
 
 ### For Production
 1. Run `jwt-control.bat`
 2. Choose option 2 (Production Mode)
-3. Test with `php test-jwt-modes.php`
 
 ### For Custom Testing
 1. Run `jwt-control.bat`
 2. Choose option 3 (Custom Mock User)
 3. Configure your test user
-4. Test with `php test-jwt-modes.php`
 
-## ðŸ›¡ï¸ Security Considerations
+## Security Considerations
 
 ### Development Mode
 - âœ… JWT bypass enabled
@@ -734,7 +709,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 - âœ… Role-based access control enforced
 - âœ… No bypass available
 
-## ðŸš¨ Troubleshooting
+## Troubleshooting
 
 ### JWT Bypass Not Working
 1. Check environment variables:
@@ -761,9 +736,8 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 ### Mock User Issues
 1. Check mock user configuration
 2. Verify role permissions
-3. Test with `php test-jwt-modes.php`
 
-## ðŸ“‹ Best Practices
+## Best Practices
 
 1. **Development**: Always use JWT bypass for local development
 2. **Testing**: Use custom mock users for specific test scenarios
@@ -771,7 +745,7 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 4. **Security**: Regularly rotate JWT secrets
 5. **Monitoring**: Log authentication attempts and failures
 
-## ðŸŽ¯ Quick Reference
+## Quick Reference
 
 | Mode | APP_ENV | APP_DEBUG | JWT_BYPASS | Authentication |
 |------|---------|-----------|------------|----------------|
@@ -779,10 +753,9 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 | Production | `production` | `false` | `false` | Required |
 | Custom | `local` | `true` | `true` | Bypassed (custom user) |
 
-## ðŸ”— Related Files
+## Related Files
 
 - `jwt-control.bat` - Interactive control script
-- `test-jwt-modes.php` - JWT mode testing
 - `config/jwt.php` - JWT configuration
 - `app/Http/Middleware/DevJwtBypass.php` - Bypass middleware
 - `app/Http/Middleware/JwtControl.php` - Advanced control middleware
