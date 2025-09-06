@@ -1,0 +1,25 @@
+# Laravel microservices root .gitignore
+.DS_Store
+Thumbs.db
+/vendor/
+/node_modules/
+.env
+.env.*
+!.env.example
+
+gateway-service/vendor/
+users-service/vendor/
+orders-service/vendor/
+gateway-service/node_modules/
+users-service/node_modules/
+orders-service/node_modules/
+
+gateway-service/storage/framework/*
+users-service/storage/framework/*
+orders-service/storage/framework/*
+gateway-service/bootstrap/cache/*
+users-service/bootstrap/cache/*
+orders-service/bootstrap/cache/*
+
+!scripts/
+!stubs/

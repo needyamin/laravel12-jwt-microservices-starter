@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microservices System Documentation</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 15px; }
+        h3 { color: #7f8c8d; margin-top: 25px; }
+        .code { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; margin: 10px 0; overflow-x: auto; }
+        .highlight { background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; }
+        .success { background: #27ae60; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .warning { background: #e74c3c; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .info { background: #3498db; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background: #34495e; color: white; }
+        .toc { background: #ecf0f1; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .toc ul { list-style-type: none; padding-left: 0; }
+        .toc li { margin: 5px 0; }
+        .toc a { text-decoration: none; color: #2c3e50; }
+        .toc a:hover { color: #3498db; }
+        .endpoint { background: #e8f5e8; padding: 10px; border-left: 4px solid #27ae60; margin: 10px 0; }
+        .method { display: inline-block; padding: 3px 8px; border-radius: 3px; font-weight: bold; margin-right: 10px; }
+        .get { background: #27ae60; color: white; }
+        .post { background: #3498db; color: white; }
+        .put { background: #f39c12; color: white; }
+        .delete { background: #e74c3c; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Laravel 12 JWT Microservices Starter</h1>
+        <div class="success">
+            <strong>✅ FULLY FUNCTIONAL!</strong> All CRUD operations and authentication endpoints are working perfectly!
+        </div>
+        
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">System Overview</a></li>
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#quick-start">Quick Start Guide</a></li>
+                <li><a href="#development">Development Mode</a></li>
+                <li><a href="#api-reference">API Reference</a></li>
+                <li><a href="#security">Security Features</a></li>
+                <li><a href="#adding-services">Adding New Services</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#production">Production Deployment</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">🎯 System Overview</h2>
+        <p>This is a fully functional Laravel 12-based microservices architecture with JWT authentication, featuring:</p>
+        <ul>
+            <li><strong>Gateway Service</strong> - API Gateway with JWT validation and request routing</li>
+            <li><strong>Users Service</strong> - User management and JWT authentication</li>
+            <li><strong>Orders Service</strong> - Order management with role-based access</li>
+        </ul>
+
+        <div class="success">
+            <strong>✅ Current Status:</strong> All systems operational! Authentication, CRUD operations, and API gateway working perfectly.
+        </div>
+
+        <div class="info">
+            <strong>💡 Key Features:</strong> JWT Authentication, Role-Based Access Control, Development Bypass, Security Headers, Input Validation, XSS Protection, JSON & Form-Data Support
+        </div>
+
+        <h2 id="architecture">🏗️ Architecture</h2>
+        <div class="code">
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Gateway       │    │   Users         │    │   Orders        │
+│   Service       │    │   Service       │    │   Service       │
+│   Port: 8000    │    │   Port: 8001    │    │   Port: 8002    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │   Client        │
+                    │   Application   │
+                    └─────────────────┘
+        </div>
+
+        <h3>Service Responsibilities</h3>
+        <table>
+            <tr><th>Service</th><th>Port</th><th>Responsibilities</th></tr>
+            <tr><td>Gateway</td><td>8000</td><td>JWT validation, request routing, security headers</td></tr>
+            <tr><td>Users</td><td>8001</td><td>Authentication, user management, JWT generation</td></tr>
+            <tr><td>Orders</td><td>8002</td><td>Order CRUD, status management, user filtering</td></tr>
+        </table>
+
+        <h2 id="quick-start">⚡ Quick Start Guide</h2>
+        
+        <h3>Prerequisites</h3>
+        <ul>
+            <li>PHP 8.2+</li>
+            <li>Composer</li>
+            <li>SQLite (or MySQL/PostgreSQL)</li>
+            <li>Firebase JWT library (automatically installed)</li>
+        </ul>
+
+        <h3>1. Setup</h3>
+        <div class="code"># Run the setup script
+setup.bat
+
+# Or manually:
+cd gateway-service && composer install && composer require firebase/php-jwt
+cd ../users-service && composer install && composer require firebase/php-jwt
+cd ../orders-service && composer install && composer require firebase/php-jwt</div>
+
+        <h3>2. Start Services</h3>
+        <div class="code"># Start all services at once
+start-all.bat
+
+# Or start individually:
+start-gateway.bat    # Port 8000
+start-users.bat      # Port 8001  
+start-orders.bat     # Port 8002</div>
+
+        <h3>3. Test System</h3>
+        <div class="code"># Test all CRUD operations
+php test-crud-operations.php
+
+# Test with JWT bypass (development mode)
+php test-dev-system.php
+
+# Test with full authentication
+php test-system.php</div>
+
+        <div class="success">
+            <strong>✅ Success!</strong> Your microservices system is now running. Access the gateway at <a href="http://localhost:8000">http://localhost:8000</a>
+        </div>
+
+        <h2 id="recent-fixes">🔧 Recent Fixes and Improvements</h2>
+        
+        <h3>Issues Fixed</h3>
+        <ul>
+            <li><strong>JWT Library Missing</strong> - Installed <code>firebase/php-jwt</code> in all services</li>
+            <li><strong>Middleware User Resolution</strong> - Fixed <code>DevJwtBypass</code> middleware to properly set user objects</li>
+            <li><strong>Controller User Access</strong> - Updated controllers to use <code>$request->user()</code> instead of <code>$request->user</code></li>
+            <li><strong>Gateway Data Forwarding</strong> - Fixed gateway to properly forward both JSON and form-data</li>
+            <li><strong>Password Hashing</strong> - Removed double-hashing in AuthController (Laravel 11's <code>hashed</code> cast handles it)</li>
+            <li><strong>User Model Fields</strong> - Added <code>is_active</code> field to the orders-service User model</li>
+            <li><strong>Form-Data Support</strong> - Gateway now properly forwards form-data by converting it to JSON</li>
+        </ul>
+
+        <h3>Current Working Features</h3>
+        <div class="success">
+            <ul>
+                <li><strong>Authentication</strong> - Register, login, JWT tokens, refresh, logout</li>
+                <li><strong>User Management</strong> - Profile management, admin user operations</li>
+                <li><strong>Order Management</strong> - Full CRUD operations, status updates, admin operations</li>
+                <li><strong>API Gateway</strong> - Proper request routing and data forwarding</li>
+                <li><strong>Multiple Formats</strong> - Both JSON and form-data supported</li>
+                <li><strong>Development Mode</strong> - JWT bypass for local development</li>
+                <li><strong>Production Mode</strong> - Full JWT authentication</li>
+            </ul>
+        </div>
+
+        <h2 id="development">🛠️ Development Mode</h2>
+        
+        <p>The system includes a <span class="highlight">JWT bypass</span> for local development that automatically authenticates requests.</p>
+
+        <h3>How It Works</h3>
+        <ul>
+            <li>Automatically enabled when <code>APP_ENV=local</code> and <code>APP_DEBUG=true</code></li>
+            <li>Creates a mock admin user for all requests</li>
+            <li>Bypasses JWT token validation</li>
+            <li>Grants admin privileges for testing</li>
+        </ul>
+
+        <h3>Development Testing</h3>
+        <div class="code"># Test without authentication
+curl http://localhost:8000/api/users/profile
+
+# Create orders without token
+curl -X POST http://localhost:8000/api/orders \
+  -H "Content-Type: application/json" \
+  -d '{"total_amount": 99.99, "shipping_address": {...}}'
+
+# Access admin endpoints
+curl http://localhost:8000/api/users
+curl http://localhost:8000/api/orders/admin/all</div>
+
+        <div class="info">
+            <strong>🔧 Mock User:</strong> ID: 1, Name: "Dev User", Email: "dev@localhost.com", Role: "admin"
+        </div>
+
+        <h2 id="api-reference">📚 API Reference</h2>
+
+        <h3>Authentication Endpoints</h3>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/auth/register</strong>
+            <p>Register a new user (Supports both JSON and Form-Data)</p>
+            <div class="code"># JSON Format (Recommended)
+{
+  "name": "John Doe",
+  "email": "john@example.com", 
+  "password": "password123",
+  "password_confirmation": "password123",
+  "role": "user"
+}
+
+# Form-Data Format (Also Supported)
+name: John Doe
+email: john@example.com
+password: password123
+password_confirmation: password123
+role: user</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/auth/login</strong>
+            <p>Login user and get JWT token (Supports both JSON and Form-Data)</p>
+            <div class="code"># JSON Format (Recommended)
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+
+# Form-Data Format (Also Supported)
+email: john@example.com
+password: password123</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/auth/refresh</strong>
+            <p>Refresh JWT token</p>
+            <div class="code">Authorization: Bearer &lt;token&gt;</div>
+        </div>
+
+        <h3>User Management</h3>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/users/profile</strong>
+            <p>Get current user profile</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span> <strong>/api/users/profile</strong>
+            <p>Update user profile</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/users</strong>
+            <p>Get all users (Admin only)</p>
+        </div>
+
+        <h3>Order Management</h3>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/orders</strong>
+            <p>Get user's orders</p>
+        </div>
+
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/orders</strong>
+            <p>Create new order</p>
+            <div class="code">{
+  "total_amount": 99.99,
+  "currency": "USD",
+  "shipping_address": {
+    "name": "John Doe",
+    "street": "123 Main St",
+    "city": "New York", 
+    "state": "NY",
+    "postal_code": "10001",
+    "country": "USA"
+  },
+  "notes": "Please deliver after 5 PM"
+}</div>
+        </div>
+
+        <div class="endpoint">
+            <span class="method put">PUT</span> <strong>/api/orders/{id}/status</strong>
+            <p>Update order status (Moderator/Admin only)</p>
+        </div>
+
+        <h3>Health Check</h3>
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/health</strong>
+            <p>Check system health status</p>
+        </div>
+
+        <h3>Postman Usage</h3>
+        
+        <h4>JSON Format (Recommended)</h4>
+        <div class="code">1. Method: POST
+2. URL: http://localhost:8000/api/auth/register
+3. Headers: 
+   - Content-Type: application/json
+   - Accept: application/json
+4. Body: Select "raw" → "JSON"
+5. JSON Body:
+{
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "password123",
+    "password_confirmation": "password123"
+}</div>
+
+        <h4>Form-Data Format (Also Supported)</h4>
+        <div class="code">1. Method: POST
+2. URL: http://localhost:8000/api/auth/register
+3. Headers: 
+   - Accept: application/json
+4. Body: Select "form-data"
+5. Form Fields:
+   - name: Test User
+   - email: test@example.com
+   - password: password123
+   - password_confirmation: password123</div>
+
+        <h2 id="security">🔒 Security Features</h2>
+
+        <h3>JWT Authentication</h3>
+        <ul>
+            <li>Secure token-based authentication</li>
+            <li>Token expiration and refresh mechanism</li>
+            <li>Role-based access control</li>
+        </ul>
+
+        <h3>Input Validation</h3>
+        <ul>
+            <li>Comprehensive request validation</li>
+            <li>SQL injection prevention via Eloquent ORM</li>
+            <li>XSS protection through input sanitization</li>
+        </ul>
+
+        <h3>Security Headers</h3>
+        <div class="code">X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+X-XSS-Protection: 1; mode=block
+Referrer-Policy: strict-origin-when-cross-origin
+Content-Security-Policy: default-src 'self'</div>
+
+        <h3>Role-Based Access Control</h3>
+        <table>
+            <tr><th>Role</th><th>Permissions</th></tr>
+            <tr><td>user</td><td>Own orders and profile</td></tr>
+            <tr><td>moderator</td><td>Manage order statuses, view all orders</td></tr>
+            <tr><td>admin</td><td>Full user and order management</td></tr>
+            <tr><td>superadmin</td><td>Highest level access</td></tr>
+        </table>
+
+        <h2 id="adding-services">➕ Adding New Services</h2>
+
+        <h3>Step 1: Create Service Directory</h3>
+        <div class="code">mkdir new-service
+cd new-service
+composer create-project laravel/laravel . --prefer-dist</div>
+
+        <h3>Step 2: Install Dependencies</h3>
+        <div class="code">composer require firebase/php-jwt</div>
+
+        <h3>Step 3: Create Middleware</h3>
+        <div class="code"># Copy DevJwtBypass.php from existing service
+# Update the middleware for your service needs</div>
+
+        <h3>Step 4: Configure Bootstrap</h3>
+        <div class="code"># In bootstrap/app.php
+->withRouting(
+    web: __DIR__.'/../routes/web.php',
+    api: __DIR__.'/../routes/api.php',
+    commands: __DIR__.'/../routes/console.php',
+    health: '/up',
+)
+->withMiddleware(function (Middleware $middleware): void {
+    $middleware->alias([
+        'jwt' => \App\Http\Middleware\JwtMiddleware::class,
+        'dev.jwt' => \App\Http\Middleware\DevJwtBypass::class,
+    ]);
+})</div>
+
+        <h3>Step 5: Create API Routes</h3>
+        <div class="code"># In routes/api.php
+Route::get('/health', function () {
+    return response()->json([
+        'service' => 'new-service',
+        'status' => 'up',
+        'timestamp' => now()
+    ]);
+});
+
+Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function () {
+    // Your protected routes here
+});</div>
+
+        <h3>Step 6: Update Gateway</h3>
+        <div class="code"># In gateway-service/app/Http/Controllers/GatewayController.php
+private $services = [
+    'users' => 'http://localhost:8001',
+    'orders' => 'http://localhost:8002',
+    'new-service' => 'http://localhost:8003',  // Add your service
+];</div>
+
+        <h3>Step 7: Add Gateway Routes</h3>
+        <div class="code"># In gateway-service/routes/api.php
+Route::prefix('new-service')->group(function () {
+    Route::get('/', function (Request $request) {
+        return app(GatewayController::class)->route($request, 'new-service', '');
+    });
+    // Add more routes as needed
+});</div>
+
+        <h3>Step 8: Create Startup Script</h3>
+        <div class="code"># Create start-new-service.bat
+@echo off
+echo Starting New Service on Port 8003...
+cd new-service
+php artisan serve --port=8003
+pause</div>
+
+        <div class="success">
+            <strong>✅ New Service Added!</strong> Your service is now integrated into the microservices architecture.
+        </div>
+
+        <h2 id="troubleshooting">🔧 Troubleshooting</h2>
+
+        <h3>Common Issues (All Fixed!)</h3>
+
+        <h4>✅ JWT Library Missing (FIXED)</h4>
+        <div class="success">
+            <strong>Issue:</strong> "Class Firebase\JWT\JWT not found"<br>
+            <strong>Solution:</strong> Firebase JWT library is now automatically installed in all services
+        </div>
+
+        <h4>✅ 422 Validation Errors (FIXED)</h4>
+        <div class="success">
+            <strong>Issue:</strong> "The name field is required" for form-data<br>
+            <strong>Solution:</strong> Gateway now properly forwards both JSON and form-data
+        </div>
+
+        <h4>✅ User Object Access (FIXED)</h4>
+        <div class="success">
+            <strong>Issue:</strong> "Attempt to read property 'id' on array"<br>
+            <strong>Solution:</strong> Middleware now properly sets user objects using setUserResolver()
+        </div>
+
+        <h4>Service Won't Start</h4>
+        <div class="warning">
+            <strong>Issue:</strong> "Port already in use"<br>
+            <strong>Solution:</strong> Check if another service is using the port, or change the port number
+        </div>
+
+        <h4>Database Connection Error</h4>
+        <div class="warning">
+            <strong>Issue:</strong> "could not find driver"<br>
+            <strong>Solution:</strong> Install SQLite extension: <code>php -m | grep sqlite</code>
+        </div>
+
+        <h4>JWT Token Issues</h4>
+        <div class="warning">
+            <strong>Issue:</strong> "Token not provided"<br>
+            <strong>Solution:</strong> Ensure you're in development mode or provide valid JWT token
+        </div>
+
+        <h4>Service Communication Error</h4>
+        <div class="warning">
+            <strong>Issue:</strong> "Service temporarily unavailable"<br>
+            <strong>Solution:</strong> Check if all services are running and accessible
+        </div>
+
+        <h3>Debug Commands</h3>
+        <div class="code"># Check service health
+curl http://localhost:8000/api/health
+
+# Test individual services
+curl http://localhost:8001/api/health  # Users service
+curl http://localhost:8002/api/health  # Orders service
+
+# Check Laravel logs
+tail -f gateway-service/storage/logs/laravel.log
+tail -f users-service/storage/logs/laravel.log
+tail -f orders-service/storage/logs/laravel.log</div>
+
+        <h2 id="production">🚀 Production Deployment</h2>
+
+        <h3>Environment Configuration</h3>
+        <div class="code"># Set production environment
+APP_ENV=production
+APP_DEBUG=false
+
+# Use strong JWT secret
+JWT_SECRET=your-super-secure-jwt-secret-key-here
+
+# Configure database
+DB_CONNECTION=mysql
+DB_HOST=your-db-host
+DB_DATABASE=your-database
+DB_USERNAME=your-username
+DB_PASSWORD=your-password</div>
+
+        <h3>Security Checklist</h3>
+        <ul>
+            <li>✅ Change default JWT secrets</li>
+            <li>✅ Use HTTPS in production</li>
+            <li>✅ Implement rate limiting</li>
+            <li>✅ Add request logging and monitoring</li>
+            <li>✅ Use production-grade databases</li>
+            <li>✅ Implement database backups</li>
+            <li>✅ Add health checks and monitoring</li>
+        </ul>
+
+        <h3>Performance Optimization</h3>
+        <ul>
+            <li>Implement caching (Redis)</li>
+            <li>Add database indexing</li>
+            <li>Optimize database queries</li>
+            <li>Implement API response caching</li>
+            <li>Use load balancing</li>
+        </ul>
+
+        <h3>Docker Deployment</h3>
+        <div class="code"># Example Dockerfile for each service
+FROM php:8.2-fpm
+RUN docker-php-ext-install pdo pdo_mysql
+COPY . /var/www/html
+WORKDIR /var/www/html
+RUN composer install --no-dev --optimize-autoloader
+EXPOSE 8000</div>
+
+        <div class="info">
+            <strong>📞 Support:</strong> For additional help, check the Laravel documentation or create an issue in the project repository.
+        </div>
+
+        <hr style="margin: 40px 0;">
+        <p style="text-align: center; color: #7f8c8d;">
+            <strong>Laravel 12 JWT Microservices Starter</strong><br>
+            ✅ Fully Functional • JWT Authentication • Role-Based Access Control • JSON & Form-Data Support<br>
+            Built with Laravel 12 • Firebase JWT • API Gateway • Microservices Architecture
+        </p>
+    </div>
+</body>
+</html>
