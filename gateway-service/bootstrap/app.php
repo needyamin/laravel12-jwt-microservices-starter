@@ -13,8 +13,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'jwt' => \App\Http\Middleware\JwtMiddleware::class,
-            'dev.jwt' => \App\Http\Middleware\DevJwtBypass::class,
+            'gateway.auth' => \App\Http\Middleware\GatewayAuth::class,
+            'require.role' => \App\Http\Middleware\RequireRole::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

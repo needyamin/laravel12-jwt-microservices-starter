@@ -4,12 +4,16 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
 
 ## ✅ Current Status: FULLY FUNCTIONAL
 
-- ✅ **Authentication**: Register, login, JWT tokens working
+- ✅ **Authentication**: Register, login, JWT tokens, introspection working
 - ✅ **CRUD Operations**: All user and order operations working  
-- ✅ **API Gateway**: Properly routing requests
+- ✅ **API Gateway**: Properly routing requests with JWT validation
 - ✅ **JSON API**: Full REST API functionality
 - ✅ **Form-Data Support**: Both JSON and form-data work through gateway
 - ✅ **JWT Authentication**: Complete JWT implementation with bypass for development
+- ✅ **Role-Based Access**: Admin/Moderator/User roles properly enforced
+- ✅ **Test Suite**: Complete end-to-end testing with `test.php` script
+- ✅ **Clean Architecture**: Professional MVC/OOP structure implemented
+- ✅ **Middleware Chain**: All middleware properly configured and working
 
 ## Architecture Overview
 
@@ -18,6 +22,11 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
 │   Gateway       │    │   Users         │    │   Orders        │
 │   Service       │    │   Service       │    │   Service       │
 │   Port: 8000    │    │   Port: 8001    │    │   Port: 8002    │
+│                 │    │                 │    │                 │
+│ • JWT Auth      │    │ • Registration  │    │ • Order CRUD    │
+│ • Request Route │    │ • Login         │    │ • User Scoped   │
+│ • Role Control  │    │ • JWT Introspect│    │ • Status Mgmt   │
+│ • Health Check  │    │ • User Profile  │    │ • Admin Access  │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
          │                       │                       │
          └───────────────────────┼───────────────────────┘
@@ -25,6 +34,7 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
                     ┌─────────────────┐
                     │   Client        │
                     │   Application   │
+                    │   (Frontend)    │
                     └─────────────────┘
 ```
 
@@ -33,28 +43,33 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
 ### 1. Gateway Service (Port 8000)
 - **Purpose**: API Gateway with JWT validation and request routing
 - **Features**:
-  - JWT token validation
+  - JWT token validation and introspection
   - Request routing to microservices
-  - Role-based access control
-  - Health check monitoring
+  - Role-based access control with `RequireRole` middleware
+  - Health check monitoring for all services
   - Security headers and XSS protection
+  - User context injection via headers (`X-User-Id`, `X-User-Email`, `X-User-Role`)
 
 ### 2. Users Service (Port 8001)
 - **Purpose**: User management and JWT authentication
 - **Features**:
   - User registration and login
   - JWT token generation and refresh
+  - JWT token introspection for gateway validation
   - User profile management
   - Role-based user management (Admin only)
   - Password hashing and validation
+  - TrustGateway middleware for gateway integration
 
 ### 3. Orders Service (Port 8002)
 - **Purpose**: Order management with user-specific access
 - **Features**:
-  - Order CRUD operations
-  - User-specific order filtering
+  - Order CRUD operations with proper validation
+  - User-specific order filtering via `X-User-Id` header
   - Order status management
   - Role-based access (Moderator/Admin can manage all orders)
+  - TrustGateway middleware for gateway integration
+  - Professional service/repository architecture
 
 ## User Roles
 
@@ -90,13 +105,37 @@ composer require firebase/php-jwt
 
 ### 2. Environment Configuration
 
-Each service needs its own `.env` file. Copy the example files and configure:
+Each service needs its own `.env` file. The services use `local_env` files for configuration:
 
 ```bash
-# For each service
-cp .env.example .env
+# For each service - copy local_env to .env
+cp local_env .env
 php artisan key:generate
 ```
+
+**Required Environment Variables:**
+
+**Gateway Service (.env):**
+```env
+JWT_SECRET=your-secret-key-change-this-in-production
+AUTH_SERVICE_URL=http://127.0.0.1:8001
+
+# Gateway Configuration
+GATEWAY_MODE=bypass
+GATEWAY_BYPASS_ROLE=admin
+```
+
+**Users Service (.env):**
+```env
+JWT_SECRET=your-secret-key-change-this-in-production
+```
+
+**Orders Service (.env):**
+```env
+JWT_SECRET=your-secret-key-change-this-in-production
+```
+
+**Note**: All services must use the same `JWT_SECRET` for proper token validation.
 
 ### 3. Database Setup
 
@@ -348,37 +387,164 @@ GET /api/health
 
 ## Recent Fixes and Improvements
 
-### 🔧 Issues Fixed
+### 🔧 Issues Fixed (Latest Update - September 7, 2025)
 1. **JWT Library Missing**: Installed `firebase/php-jwt` in all services
-2. **Middleware User Resolution**: Fixed `DevJwtBypass` middleware to properly set user objects
+2. **Middleware User Resolution**: Fixed `TrustGateway` middleware to properly set user objects using `$request->setUserResolver()`
 3. **Controller User Access**: Updated controllers to use `$request->user()` instead of `$request->user`
 4. **Gateway Data Forwarding**: Fixed gateway to properly forward both JSON and form-data
 5. **Password Hashing**: Removed double-hashing in AuthController (Laravel 11's `hashed` cast handles it)
 6. **User Model Fields**: Added `is_active` field to the orders-service User model
 7. **Form-Data Support**: Gateway now properly forwards form-data by converting it to JSON
+8. **Missing Middleware**: Created and registered `RequireRole` middleware in gateway service
+9. **Missing Introspect Endpoint**: Added `/api/introspect` endpoint to users service for gateway JWT validation
+10. **Environment Variables**: Added missing `AUTH_SERVICE_URL` and `JWT_SECRET` to gateway and users services
+11. **Middleware Cleanup**: Removed unused middleware files (`DevJwtBypass`, `JwtMiddleware`, `SecurityMiddleware`, `JwtControl`)
+12. **Route Configuration**: Updated all services to use correct middleware aliases (`gateway.auth`, `trust.gateway`, `require.role`)
+13. **User Resolution Fix**: Fixed `TrustGateway` middleware to fetch actual User model from database instead of mock object
+14. **Test Script Updates**: Updated test script to use correct endpoints (`/api/users/profile` instead of `/api/users`)
+15. **Gateway Bypass Mode**: Implemented proper bypass mode with `GATEWAY_MODE=bypass` configuration
+16. **Bypass User Creation**: Fixed "User not found" error by implementing automatic user creation in bypass mode
+17. **Middleware Registration**: Fixed missing `require.role` middleware registration in gateway service
+18. **Environment File Setup**: Created proper `.env` file configuration for all services
 
 ### ✅ Current Working Features
-- **Authentication**: Register, login, JWT tokens, refresh, logout
+- **Authentication**: Register, login, JWT tokens, refresh, logout, introspect
 - **User Management**: Profile management, admin user operations
 - **Order Management**: Full CRUD operations, status updates, admin operations
-- **API Gateway**: Proper request routing and data forwarding
+- **API Gateway**: Proper request routing and data forwarding with JWT validation
 - **Multiple Formats**: Both JSON and form-data supported
-- **Development Mode**: JWT bypass for local development
-- **Production Mode**: Full JWT authentication
+- **Gateway Bypass Mode**: Development mode with automatic user creation and admin privileges
+- **Production Mode**: Full JWT authentication with role-based access control
+- **Test Suite**: Complete end-to-end testing with `test.php` script
+- **Clean Architecture**: Professional MVC/OOP structure with service and repository layers
+- **Middleware Chain**: Complete middleware implementation with proper user resolution
 
 ## Testing the System
 
-### Development Mode (JWT Bypass Enabled)
+### Gateway Bypass Mode (Development)
 
-For local development, the system includes JWT bypass functionality that automatically authenticates requests with a mock admin user when `APP_ENV=local` and `APP_DEBUG=true`.
+The system includes a powerful bypass mode for local development that eliminates the need for JWT authentication while maintaining full functionality.
 
+### How to Enable Gateway Bypass Mode
 
-#### Test Protected Endpoints Without Authentication
+#### Method 1: Environment Variables (Recommended)
+Add these variables to your `gateway-service/.env` file:
+
+```env
+# Gateway Configuration
+GATEWAY_MODE=bypass
+GATEWAY_BYPASS_ROLE=admin
+```
+
+#### Method 2: Check Current Mode
+The system automatically detects the mode. You can verify it by running:
 ```bash
-# Get user profile (no token required in dev mode)
+php test.php
+```
+Look for: `Gateway mode: bypass` or `Gateway mode: introspect`
+
+### How Gateway Bypass Works
+
+1. **Gateway Level**: When `GATEWAY_MODE=bypass`, the gateway skips JWT validation
+2. **User Creation**: The system automatically creates/finds a bypass user (`dev@example.com`)
+3. **Role Assignment**: Uses the role specified in `GATEWAY_BYPASS_ROLE` (default: `admin`)
+4. **Seamless Operation**: All CRUD operations work without authentication tokens
+
+### Bypass Mode vs Normal Mode
+
+| Feature | Bypass Mode | Normal Mode |
+|---------|-------------|-------------|
+| Authentication | ❌ Not Required | ✅ JWT Required |
+| User Creation | 🔄 Auto-created | 👤 Real users |
+| Role Access | 🔓 Admin by default | 🔐 Based on JWT claims |
+| Development | 🚀 Perfect for testing | 🏭 Production ready |
+
+
+#### Quick Smoke Test Script
+Run the repository root script to verify auth + CRUD via the gateway. It adapts to bypass vs introspect automatically.
+
+```bash
+php test.php
+```
+
+**Expected Output (Bypass Mode):**
+```
+Gateway mode: bypass
+
+=== Health ===
+[OK] gateway /api/health (200)
+[OK] users-service /up (200)
+[OK] orders-service /up (200)
+
+=== Register ===
+[OK] users-service register (201)
+
+=== Login ===
+[OK] users-service login (200)
+
+=== Current user via gateway ===
+[OK] GET /api/users/profile (200)
+
+=== User profile update via gateway ===
+[OK] PUT /api/users/profile (200)
+
+=== Orders CRUD via gateway ===
+[OK] POST /api/orders (201)
+[OK] GET /api/orders (200)
+[OK] GET /api/orders/{id} (200)
+[OK] PUT /api/orders/{id} (200)
+[OK] DELETE /api/orders/{id} (200)
+
+=== Logout (optional) ===
+
+All checks passed ✅
+```
+
+**Expected Output (Normal Mode):**
+```
+Gateway mode: introspect
+
+=== Health ===
+[OK] gateway /api/health (200)
+[OK] users-service /up (200)
+[OK] orders-service /up (200)
+
+=== Register ===
+[OK] users-service register (201)
+
+=== Login ===
+[OK] users-service login (200)
+
+=== Current user via gateway ===
+[OK] GET /api/users/profile (200)
+
+=== User profile update via gateway ===
+[OK] PUT /api/users/profile (200)
+
+=== Orders CRUD via gateway ===
+[OK] POST /api/orders (201)
+[OK] GET /api/orders (200)
+[OK] GET /api/orders/{id} (200)
+[OK] PUT /api/orders/{id} (200)
+[OK] DELETE /api/orders/{id} (200)
+
+=== Logout (optional) ===
+
+All checks passed ✅
+```
+
+What it does:
+- Health checks for all services
+- Registers a user and logs in (if not bypass)
+- Through the gateway: current user profile; user profile update; full orders CRUD
+- Attempts logout (ignored if not present)
+
+#### Test Protected Endpoints in Bypass Mode
+```bash
+# Get user profile (no token required in bypass mode)
 curl http://localhost:8000/api/users/profile
 
-# Create an order (no token required in dev mode)
+# Create an order (no token required in bypass mode)
 curl -X POST http://localhost:8000/api/orders \
   -H "Content-Type: application/json" \
   -d '{
@@ -393,9 +559,19 @@ curl -X POST http://localhost:8000/api/orders \
     }
   }'
 
-# Access admin endpoints (no token required in dev mode)
+# Access admin endpoints (no token required in bypass mode)
 curl http://localhost:8000/api/users
 curl http://localhost:8000/api/orders/admin/all
+```
+
+#### Test Protected Endpoints in Normal Mode
+```bash
+# These will return 401 Unauthorized without valid JWT token
+curl http://localhost:8000/api/users/profile  # Returns 401
+curl http://localhost:8000/api/orders         # Returns 401
+
+# With valid JWT token (after login)
+curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8000/api/users/profile
 ```
 
 ### Production Mode (Full Authentication)
@@ -479,17 +655,40 @@ curl http://localhost:8000/api/health
 
 ## Development Notes
 
-### JWT Bypass for Local Development
-The system includes a development bypass that automatically authenticates requests when running in local development mode (`APP_ENV=local` and `APP_DEBUG=true`). This bypass:
+### Gateway Bypass Mode Details
 
-- Creates a mock admin user for all requests
-- Bypasses JWT token validation
-- Allows testing of protected endpoints without authentication
-- Automatically grants admin privileges for role-based testing
+The gateway bypass mode is controlled by the `GATEWAY_MODE` environment variable in the gateway service:
 
-**To enable/disable the bypass:**
-- **Enable**: Set `APP_ENV=local` and `APP_DEBUG=true` in your `.env` files
-- **Disable**: Set `APP_ENV=production` or `APP_DEBUG=false`
+#### How It Works
+
+1. **Gateway Level**: 
+   - When `GATEWAY_MODE=bypass`, the `GatewayAuth` middleware skips JWT validation
+   - Sets `X-Bypass-Mode: true` header for downstream services
+   - Sets `X-User-Email` and `X-User-Role` headers
+
+2. **Users Service**:
+   - `TrustGateway` middleware detects bypass mode
+   - Automatically creates/finds user by email (`dev@example.com`)
+   - Sets proper user object for `$request->user()`
+
+3. **Orders Service**:
+   - `TrustGateway` middleware detects bypass mode
+   - Creates mock user object with admin privileges
+   - Allows all CRUD operations without authentication
+
+#### Configuration Options
+
+```env
+# Gateway Service (.env)
+GATEWAY_MODE=bypass          # Enable bypass mode
+GATEWAY_BYPASS_ROLE=admin    # Role for bypass user (admin, user, moderator)
+```
+
+#### Switching Modes
+
+- **Enable Bypass**: Set `GATEWAY_MODE=bypass` in gateway service
+- **Disable Bypass**: Set `GATEWAY_MODE=introspect` in gateway service
+- **Restart Required**: Restart gateway service after changing mode
 
 ### Database
 - Users service uses SQLite for user management

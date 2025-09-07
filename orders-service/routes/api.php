@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\OrderController;
-use App\Http\Middleware\JwtMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,7 +25,7 @@ Route::get('/health', function () {
 });
 
 // Protected routes (require authentication)
-Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function () {
+Route::middleware(['trust.gateway'])->group(function () {
     
     // Order management routes
     Route::get('/', [OrderController::class, 'index']);
@@ -36,7 +35,7 @@ Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function ()
     Route::delete('/{id}', [OrderController::class, 'destroy']);
     
     // Moderator and Admin routes
-    Route::middleware([\App\Http\Middleware\DevJwtBypass::class . ':moderator,admin,superadmin'])->group(function () {
+    Route::middleware(['require.role:moderator,admin,superadmin'])->group(function () {
         Route::get('/admin/all', [OrderController::class, 'adminAll']);
         Route::put('/{id}/status', [OrderController::class, 'updateStatus']);
     });

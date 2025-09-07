@@ -189,6 +189,50 @@ class AuthController extends Controller
     }
 
     /**
+     * Introspect JWT token (for gateway)
+     */
+    public function introspect(Request $request)
+    {
+        $data = $request->all();
+        
+        if (!isset($data['token'])) {
+            return response()->json([
+                'active' => false,
+                'error' => 'Token not provided'
+            ], 400);
+        }
+
+        try {
+            $key = config('jwt.secret');
+            $decoded = JWT::decode($data['token'], new Key($key, 'HS256'));
+            
+            $user = User::find($decoded->sub);
+            
+            if (!$user || !$user->is_active) {
+                return response()->json([
+                    'active' => false,
+                    'error' => 'User not found or inactive'
+                ]);
+            }
+
+            return response()->json([
+                'active' => true,
+                'sub' => $user->id,
+                'email' => $user->email,
+                'role' => $user->role,
+                'iat' => $decoded->iat,
+                'exp' => $decoded->exp
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'active' => false,
+                'error' => 'Invalid token'
+            ]);
+        }
+    }
+
+    /**
      * Logout user
      */
     public function logout(Request $request)

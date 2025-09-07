@@ -4,8 +4,12 @@ APP_KEY=base64:RR6ahlopVA+Pg/T5fFAnDT2qjARiYNGr9Q6xM6VoJjE=
 APP_DEBUG=true
 APP_URL=http://localhost
 
-JWT_BYPASS=false 
-JWT_MOCK_USER_ROLE=admin 
+JWT_SECRET=your-secret-key-change-this-in-production
+AUTH_SERVICE_URL=http://127.0.0.1:8001
+
+# Gateway Configuration
+GATEWAY_MODE=bypass
+GATEWAY_BYPASS_ROLE=admin 
 
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
@@ -23,12 +27,8 @@ LOG_STACK=single
 LOG_DEPRECATIONS_CHANNEL=null
 LOG_LEVEL=debug
 
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=microservice_user
-DB_USERNAME=root
-DB_PASSWORD=
+DB_CONNECTION=sqlite
+DB_DATABASE=database/database.sqlite
 
 SESSION_DRIVER=file
 SESSION_LIFETIME=120

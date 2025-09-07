@@ -11,6 +11,8 @@ APP_KEY=base64:qw14GQHp1yN4FPWoSQrQz4ML+612gzMn991ojLRF0+k=
 APP_DEBUG=true
 APP_URL=http://localhost
 
+JWT_SECRET=your-secret-key-change-this-in-production
+
 APP_LOCALE=en
 APP_FALLBACK_LOCALE=en
 APP_FAKER_LOCALE=en_US

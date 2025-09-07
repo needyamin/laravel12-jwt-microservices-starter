@@ -1,54 +1,34 @@
 {
 	"info": {
 		"_postman_id": "7ba810d6-232d-4362-a663-c6e9e1c73ba2",
-		"name": "Laravel Microservices System",
-		"description": "API Gateway, Users Service, and Orders Service with JWT authentication & role-based access control.",
+		"name": "Office Management ERP - Microservices API",
+		"description": "Complete API collection for Office Management ERP system with Gateway, Users Service, and Orders Service. Features JWT authentication, role-based access control, and comprehensive CRUD operations.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32341795"
 	},
 	"item": [
 		{
-			"name": "Auth",
+			"name": "🔐 Authentication",
+			"description": "Public authentication endpoints - no token required",
 			"item": [
 				{
 					"name": "Register User",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "name",
-									"value": "John Doe",
-									"type": "text"
-								},
-								{
-									"key": "email",
-									"value": "john@example.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "password123",
-									"type": "text"
-								},
-								{
-									"key": "password_confirmation",
-									"value": "password123",
-									"type": "text"
-								},
-								{
-									"key": "role",
-									"value": "user",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"role\": \"user\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/register",
+							"raw": "{{gateway_url}}/api/auth/register",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -63,26 +43,20 @@
 					"name": "Login",
 					"request": {
 						"method": "POST",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "email",
-									"value": "john@example.com",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "password123",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/auth/login",
+							"raw": "{{gateway_url}}/api/auth/login",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -101,12 +75,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/auth/refresh",
+							"raw": "{{gateway_url}}/api/auth/refresh",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -125,12 +103,16 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/auth/logout",
+							"raw": "{{gateway_url}}/api/auth/logout",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -144,10 +126,11 @@
 			]
 		},
 		{
-			"name": "Users",
+			"name": "👤 User Management",
+			"description": "User profile and management endpoints",
 			"item": [
 				{
-					"name": "Get Profile",
+					"name": "Get My Profile",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -157,9 +140,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users/profile",
+							"raw": "{{gateway_url}}/api/users/profile",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -171,44 +154,27 @@
 					"response": []
 				},
 				{
-					"name": "Update Profile",
+					"name": "Update My Profile",
 					"request": {
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "name",
-									"value": "John Updated",
-									"type": "text"
-								},
-								{
-									"key": "current_password",
-									"value": "password123",
-									"type": "text"
-								},
-								{
-									"key": "password",
-									"value": "newpassword123",
-									"type": "text"
-								},
-								{
-									"key": "password_confirmation",
-									"value": "newpassword123",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Updated\",\n    \"current_password\": \"password123\",\n    \"password\": \"newpassword123\",\n    \"password_confirmation\": \"newpassword123\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/profile",
+							"raw": "{{gateway_url}}/api/users/profile",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -218,21 +184,27 @@
 						}
 					},
 					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "👑 Admin - User Management",
+			"description": "Admin-only user management endpoints (requires admin/superadmin role)",
+			"item": [
 				{
-					"name": "Get All Users (Admin)",
+					"name": "Get All Users",
 					"request": {
 						"method": "GET",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"value": "Bearer {{admin_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/users",
+							"raw": "{{gateway_url}}/api/users",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -243,39 +215,75 @@
 					"response": []
 				},
 				{
-					"name": "Update User (Admin)",
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/users/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
 					"request": {
 						"method": "PUT",
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "name",
-									"value": "Updated Name",
-									"type": "text"
-								},
-								{
-									"key": "role",
-									"value": "moderator",
-									"type": "text"
-								},
-								{
-									"key": "is_active",
-									"value": "true",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Updated Name\",\n    \"role\": \"moderator\",\n    \"is_active\": true\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/users/1",
+							"raw": "{{gateway_url}}/api/users/1",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/users/1",
+							"host": [
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -289,10 +297,11 @@
 			]
 		},
 		{
-			"name": "Orders",
+			"name": "📦 Order Management",
+			"description": "Order CRUD operations for authenticated users",
 			"item": [
 				{
-					"name": "Get User Orders",
+					"name": "Get My Orders",
 					"request": {
 						"method": "GET",
 						"header": [
@@ -302,9 +311,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/orders",
+							"raw": "{{gateway_url}}/api/orders",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -322,62 +331,20 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "total_amount",
-									"value": "99.99",
-									"type": "text"
-								},
-								{
-									"key": "currency",
-									"value": "USD",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[name]",
-									"value": "John Doe",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[street]",
-									"value": "123 Main St",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[city]",
-									"value": "New York",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[state]",
-									"value": "NY",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[postal_code]",
-									"value": "10001",
-									"type": "text"
-								},
-								{
-									"key": "shipping_address[country]",
-									"value": "USA",
-									"type": "text"
-								},
-								{
-									"key": "notes",
-									"value": "Please deliver after 5 PM",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"total_amount\": 99.99,\n    \"currency\": \"USD\",\n    \"shipping_address\": {\n        \"name\": \"John Doe\",\n        \"street\": \"123 Main St\",\n        \"city\": \"New York\",\n        \"state\": \"NY\",\n        \"postal_code\": \"10001\",\n        \"country\": \"USA\"\n    },\n    \"notes\": \"Please deliver after 5 PM\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/orders",
+							"raw": "{{gateway_url}}/api/orders",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -398,9 +365,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/orders/1",
+							"raw": "{{gateway_url}}/api/orders/1",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -419,27 +386,20 @@
 							{
 								"key": "Authorization",
 								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
 							}
 						],
 						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "status",
-									"value": "processing",
-									"type": "text"
-								},
-								{
-									"key": "notes",
-									"value": "Updated notes",
-									"type": "text"
-								}
-							]
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"processing\",\n    \"notes\": \"Updated notes\"\n}"
 						},
 						"url": {
-							"raw": "{{base_url}}/api/orders/1",
+							"raw": "{{gateway_url}}/api/orders/1",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -461,9 +421,9 @@
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/orders/1",
+							"raw": "{{gateway_url}}/api/orders/1",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -473,42 +433,13 @@
 						}
 					},
 					"response": []
-				},
-				{
-					"name": "Update Order Status (Admin)",
-					"request": {
-						"method": "PUT",
-						"header": [
-							{
-								"key": "Authorization",
-								"value": "Bearer {{token}}"
-							}
-						],
-						"body": {
-							"mode": "formdata",
-							"formdata": [
-								{
-									"key": "status",
-									"value": "shipped",
-									"type": "text"
-								}
-							]
-						},
-						"url": {
-							"raw": "{{base_url}}/api/orders/1/status",
-							"host": [
-								"{{base_url}}"
-							],
-							"path": [
-								"api",
-								"orders",
-								"1",
-								"status"
-							]
-						}
-					},
-					"response": []
-				},
+				}
+			]
+		},
+		{
+			"name": "🔧 Admin - Order Management",
+			"description": "Admin/Moderator order management endpoints",
+			"item": [
 				{
 					"name": "Get All Orders (Admin)",
 					"request": {
@@ -516,13 +447,13 @@
 						"header": [
 							{
 								"key": "Authorization",
-								"value": "Bearer {{token}}"
+								"value": "Bearer {{admin_token}}"
 							}
 						],
 						"url": {
-							"raw": "{{base_url}}/api/orders/admin/all",
+							"raw": "{{gateway_url}}/api/orders/admin/all",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
 							],
 							"path": [
 								"api",
@@ -533,21 +464,91 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Update Order Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{admin_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"shipped\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/orders/1/status",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"orders",
+								"1",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
 		{
-			"name": "System",
+			"name": "🏥 System Health",
+			"description": "System health and status endpoints",
 			"item": [
 				{
-					"name": "Health Check",
+					"name": "Gateway Health Check",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{base_url}}/api/health",
+							"raw": "{{gateway_url}}/api/health",
 							"host": [
-								"{{base_url}}"
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{users_url}}/api/health",
+							"host": [
+								"{{users_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Orders Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{orders_url}}/api/health",
+							"host": [
+								"{{orders_url}}"
 							],
 							"path": [
 								"api",
@@ -558,16 +559,160 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "🔧 Direct Service Access",
+			"description": "Direct access to individual services (for development/testing)",
+			"item": [
+				{
+					"name": "Users Service - Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Direct User\",\n    \"email\": \"direct@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\",\n    \"role\": \"user\"\n}"
+						},
+						"url": {
+							"raw": "{{users_url}}/api/auth/register",
+							"host": [
+								"{{users_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Users Service - Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"direct@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{users_url}}/api/auth/login",
+							"host": [
+								"{{users_url}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Orders Service - Create Order",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"total_amount\": 150.00,\n    \"currency\": \"USD\",\n    \"shipping_address\": {\n        \"name\": \"Direct User\",\n        \"street\": \"456 Direct St\",\n        \"city\": \"Direct City\",\n        \"state\": \"DC\",\n        \"postal_code\": \"12345\",\n        \"country\": \"USA\"\n    },\n    \"notes\": \"Direct service test\"\n}"
+						},
+						"url": {
+							"raw": "{{orders_url}}/api/",
+							"host": [
+								"{{orders_url}}"
+							],
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"variable": [
 		{
-			"key": "base_url",
-			"value": "http://127.0.0.1:8000"
+			"key": "gateway_url",
+			"value": "http://127.0.0.1:8000",
+			"description": "API Gateway URL"
+		},
+		{
+			"key": "users_url",
+			"value": "http://127.0.0.1:8001",
+			"description": "Users Service URL"
+		},
+		{
+			"key": "orders_url",
+			"value": "http://127.0.0.1:8002",
+			"description": "Orders Service URL"
 		},
 		{
 			"key": "token",
-			"value": ""
+			"value": "",
+			"description": "JWT token for regular user authentication"
+		},
+		{
+			"key": "admin_token",
+			"value": "",
+			"description": "JWT token for admin user authentication"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-set Content-Type for JSON requests",
+					"if (pm.request.body && pm.request.body.mode === 'raw') {",
+					"    pm.request.headers.add({",
+					"        key: 'Content-Type',",
+					"        value: 'application/json'",
+					"    });",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Auto-extract token from login responses",
+					"if (pm.response.json() && pm.response.json().token) {",
+					"    pm.collectionVariables.set('token', pm.response.json().token);",
+					"    console.log('Token saved to collection variable');",
+					"}",
+					"",
+					"// Log response for debugging",
+					"console.log('Response Status:', pm.response.status);",
+					"console.log('Response Body:', pm.response.text());"
+				]
+			}
 		}
 	]
 }

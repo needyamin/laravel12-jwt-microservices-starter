@@ -3,7 +3,6 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\GatewayController;
-use App\Http\Middleware\JwtMiddleware;
 
 /*
 |--------------------------------------------------------------------------
@@ -32,10 +31,14 @@ Route::prefix('auth')->group(function () {
     Route::post('/refresh', function (Request $request) {
         return app(GatewayController::class)->route($request, 'users', 'api/auth/refresh');
     });
+    
+    Route::post('/logout', function (Request $request) {
+        return app(GatewayController::class)->route($request, 'users', 'api/auth/logout');
+    });
 });
 
 // Protected routes (require authentication)
-Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function () {
+Route::middleware(['gateway.auth'])->group(function () {
     
     // User profile routes
     Route::prefix('users')->group(function () {
@@ -45,10 +48,6 @@ Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function ()
         
         Route::put('/profile', function (Request $request) {
             return app(GatewayController::class)->route($request, 'users', 'api/profile');
-        });
-        
-        Route::post('/logout', function (Request $request) {
-            return app(GatewayController::class)->route($request, 'users', 'api/auth/logout');
         });
     });
     
@@ -77,7 +76,7 @@ Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function ()
 });
 
 // Admin only routes (separate group)
-Route::middleware([\App\Http\Middleware\DevJwtBypass::class . ':admin,superadmin'])->group(function () {
+Route::middleware(['gateway.auth', 'require.role:admin,superadmin'])->group(function () {
     Route::prefix('users')->group(function () {
         Route::get('/', function (Request $request) {
             return app(GatewayController::class)->route($request, 'users', 'api/');
@@ -98,7 +97,7 @@ Route::middleware([\App\Http\Middleware\DevJwtBypass::class . ':admin,superadmin
 });
 
 // Moderator and Admin routes for orders
-Route::middleware([\App\Http\Middleware\DevJwtBypass::class . ':moderator,admin,superadmin'])->group(function () {
+Route::middleware(['gateway.auth', 'require.role:moderator,admin,superadmin'])->group(function () {
     Route::prefix('orders')->group(function () {
         Route::get('/admin/all', function (Request $request) {
             return app(GatewayController::class)->route($request, 'orders', 'api/admin/all');
