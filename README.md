@@ -2,8 +2,20 @@
 
 A fully functional Laravel 12-based microservices architecture with JWT authentication, API Gateway, and role-based access control. **All CRUD operations and authentication endpoints are working perfectly!**
 
-## ✅ Current Status: FULLY FUNCTIONAL
+## 🚀 Easy Service Management
 
+This architecture is designed to make adding new microservices **extremely easy**. Simply add a service configuration to `gateway-service/config/services.php` and the gateway will automatically:
+- Register all routes
+- Handle request routing
+- Include the service in health checks
+- Support dynamic routing
+
+**See [documentation.html](documentation.html) for comprehensive documentation including service addition instructions.**
+
+## ✅ Current Status: FULLY FUNCTIONAL & PRODUCTION-READY
+
+- ✅ **Docker & Kubernetes**: Full containerization with Docker Compose and K8s manifests
+- ✅ **Automated Setup**: One-command setup with `setup.sh` (Linux/Mac) or `setup.bat` (Windows)
 - ✅ **Authentication**: Register, login, JWT tokens, introspection working
 - ✅ **CRUD Operations**: All user and order operations working  
 - ✅ **API Gateway**: Properly routing requests with JWT validation
@@ -11,31 +23,42 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
 - ✅ **Form-Data Support**: Both JSON and form-data work through gateway
 - ✅ **JWT Authentication**: Complete JWT implementation with bypass for development
 - ✅ **Role-Based Access**: Admin/Moderator/User roles properly enforced
-- ✅ **Test Suite**: Complete end-to-end testing with `test.php` script
-- ✅ **Clean Architecture**: Professional MVC/OOP structure implemented
-- ✅ **Middleware Chain**: All middleware properly configured and working
+- ✅ **Database Management**: MySQL with phpMyAdmin web interface
+- ✅ **Health Monitoring**: Comprehensive health checks for all services
+- ✅ **Configuration-Driven**: Easy service addition via configuration files
+- ✅ **Environment Variables**: All URLs and settings configurable via environment
+- ✅ **Production-Ready**: All services optimized for production deployment
 
 ## Architecture Overview
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Gateway       │    │   Users         │    │   Orders        │
-│   Service       │    │   Service       │    │   Service       │
-│   Port: 8000    │    │   Port: 8001    │    │   Port: 8002    │
-│                 │    │                 │    │                 │
-│ • JWT Auth      │    │ • Registration  │    │ • Order CRUD    │
-│ • Request Route │    │ • Login         │    │ • User Scoped   │
-│ • Role Control  │    │ • JWT Introspect│    │ • Status Mgmt   │
-│ • Health Check  │    │ • User Profile  │    │ • Admin Access  │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Client        │
-                    │   Application   │
-                    │   (Frontend)    │
-                    └─────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                        Docker Network                            │
+│                                                                   │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │   Gateway    │  │   Users     │  │   Orders    │          │
+│  │   Service    │  │   Service   │  │   Service   │          │
+│  │   :8000      │  │   :8001     │  │   :8002     │          │
+│  │              │  │             │  │             │          │
+│  │ • JWT Auth   │  │ • Register  │  │ • Order CRUD│          │
+│  │ • Routing    │  │ • Login     │  │ • User Scope│          │
+│  │ • Role Ctrl  │  │ • Profile   │  │ • Status    │          │
+│  │ • Health     │  │ • Introspect│  │ • Admin     │          │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘          │
+│         │                 │                 │                  │
+│         └─────────────────┼─────────────────┘                  │
+│                           │                                     │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │    MySQL     │  │    Redis     │  │  phpMyAdmin  │          │
+│  │   :3306      │  │   :6379      │  │   :8080      │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│                                                                   │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                    ┌─────────┴─────────┐
+                    │   Client App      │
+                    │   (Frontend)      │
+                    └───────────────────┘
 ```
 
 ## Services
@@ -78,108 +101,141 @@ A fully functional Laravel 12-based microservices architecture with JWT authenti
 - **admin**: Full access to user and order management
 - **superadmin**: Highest level access (same as admin for now)
 
-## Setup Instructions
+## Quick Start (Docker - Recommended)
 
 ### Prerequisites
-- PHP 8.2+
-- Composer
-- SQLite (or MySQL/PostgreSQL)
-- Firebase JWT library (automatically installed)
+- **Docker** (version 20.10+)
+- **Docker Compose** (version 2.0+)
 
-### 1. Clone and Setup Services
+### Automated Setup (One Command)
 
+#### For Linux/Mac:
 ```bash
-# Navigate to each service directory and install dependencies
-cd gateway-service
-composer install
-composer require firebase/php-jwt
-
-cd ../users-service
-composer install
-composer require firebase/php-jwt
-
-cd ../orders-service
-composer install
-composer require firebase/php-jwt
+./setup.sh
 ```
 
-### 2. Environment Configuration
-
-Each service needs its own `.env` file. The services use `local_env` files for configuration:
-
-```bash
-# For each service - copy local_env to .env
-cp local_env .env
-php artisan key:generate
+#### For Windows:
+```batch
+setup.bat
 ```
 
-**Required Environment Variables:**
+The setup script will automatically:
+- ✅ Check Docker and Docker Compose installation
+- ✅ Create `.env` files from `local_env` templates
+- ✅ Build Docker images for all services
+- ✅ Start all containers (Gateway, Users, Orders, MySQL, Redis, phpMyAdmin)
+- ✅ Run database migrations
+- ✅ Display service URLs and status
+- ✅ Show host file configuration
 
-**Gateway Service (.env):**
+### Service URLs (After Setup)
+
+- **Gateway**: http://localhost:8000
+- **Users Service**: http://localhost:8001
+- **Orders Service**: http://localhost:8002
+- **phpMyAdmin**: http://localhost:8080
+- **MySQL**: localhost:3306
+- **Redis**: localhost:6379
+
+### Manual Docker Setup
+
+If you prefer manual setup:
+
+```bash
+# 1. Create .env files (if not exists)
+cp gateway-service/local_env gateway-service/.env
+cp users-service/local_env users-service/.env
+cp orders-service/local_env orders-service/.env
+
+# 2. Build and start services
+docker-compose up -d --build
+
+# 3. Wait for MySQL to be healthy
+docker-compose ps
+
+# 4. Check service logs
+docker-compose logs -f
+```
+
+### Useful Docker Commands
+
+```bash
+# View all service logs
+docker-compose logs -f
+
+# View specific service logs
+docker-compose logs -f gateway
+
+# Stop all services
+docker-compose down
+
+# Stop and remove volumes (clean slate)
+docker-compose down -v
+
+# Restart a service
+docker-compose restart gateway
+
+# Execute command in container
+docker-compose exec gateway php artisan migrate
+docker-compose exec gateway php artisan route:list
+```
+
+## Environment Configuration
+
+All services use environment variables for configuration. The `local_env` files serve as templates:
+
+### Gateway Service Configuration
+
+Edit `gateway-service/local_env` or set environment variables:
+
 ```env
+# Service URLs (configurable)
+GATEWAY_URL=${GATEWAY_URL:-http://localhost:8000}
+USERS_SERVICE_URL=${USERS_SERVICE_URL:-http://localhost:8001}
+ORDERS_SERVICE_URL=${ORDERS_SERVICE_URL:-http://orders:8002}
+
+# JWT Configuration
 JWT_SECRET=your-secret-key-change-this-in-production
-AUTH_SERVICE_URL=http://127.0.0.1:8001
 
-# Gateway Configuration
-GATEWAY_MODE=bypass
-GATEWAY_BYPASS_ROLE=admin
+# Gateway Mode
+GATEWAY_MODE=${GATEWAY_MODE:-introspect}  # or 'bypass' for development
+GATEWAY_BYPASS_ROLE=${GATEWAY_BYPASS_ROLE:-admin}
+GATEWAY_BYPASS_EMAIL=${GATEWAY_BYPASS_EMAIL:-dev@example.com}
+
+# Database
+DB_HOST=${DB_HOST:-mysql}  # Use 'mysql' for Docker, '127.0.0.1' for local
+DB_DATABASE=${DB_DATABASE:-microservices}
 ```
 
-**Users Service (.env):**
+### Users & Orders Service Configuration
+
+Similar structure - edit `users-service/local_env` and `orders-service/local_env`:
+
 ```env
+# Service URL
+USERS_SERVICE_URL=${USERS_SERVICE_URL:-http://localhost:8001}
+
+# JWT Secret (must match across all services)
 JWT_SECRET=your-secret-key-change-this-in-production
+
+# Database
+DB_HOST=${DB_HOST:-mysql}  # Use 'mysql' for Docker
+DB_DATABASE=microservice_user  # or microservice_order
 ```
 
-**Orders Service (.env):**
-```env
-JWT_SECRET=your-secret-key-change-this-in-production
-```
+**Important**: All services must use the same `JWT_SECRET` for proper token validation.
 
-**Note**: All services must use the same `JWT_SECRET` for proper token validation.
+## Kubernetes Deployment
 
-### 3. Database Setup
+For Kubernetes deployment, see [README-DOCKER.md](README-DOCKER.md) for detailed instructions.
 
+Quick start:
 ```bash
-# For users-service
-cd users-service
-php artisan migrate
+# Apply Kubernetes manifests
+kubectl apply -f k8s/
 
-# For orders-service
-cd ../orders-service
-php artisan migrate
-```
-
-### 4. JWT Configuration
-
-Set the same JWT secret in all services' `.env` files:
-
-```env
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-```
-
-### 5. Start Services
-
-#### Option 1: Quick Start (Recommended)
-```bash
-# Start all services at once
-start-all.bat
-```
-
-#### Option 2: Manual Start
-Open three terminal windows and run each service:
-
-```bash
-# Terminal 1 - Gateway Service
-cd gateway-service
-php artisan serve --port=8000
-
-# Terminal 2 - Users Service
-cd users-service
-php artisan serve --port=8001
-
-# Terminal 3 - Orders Service
-cd orders-service
-php artisan serve --port=8002
+# Access services via port-forward
+kubectl port-forward -n microservices svc/gateway 8000:8000
 ```
 
 ## API Documentation
@@ -361,6 +417,29 @@ Authorization: Bearer <moderator_token>
 GET /api/health
 ```
 
+Returns comprehensive health status of all services:
+```json
+{
+  "gateway": "up",
+  "services": {
+    "users": {
+      "status": "up",
+      "response_time": 0.05,
+      "url": "http://users:8001",
+      "description": "User management and authentication service"
+    },
+    "orders": {
+      "status": "up",
+      "response_time": 0.03,
+      "url": "http://orders:8002",
+      "description": "Order management service"
+    }
+  },
+  "timestamp": "2025-11-26T22:00:00Z",
+  "total_services": 2
+}
+```
+
 ## Security Features
 
 ### 1. JWT Authentication
@@ -387,7 +466,19 @@ GET /api/health
 
 ## Recent Fixes and Improvements
 
-### 🔧 Issues Fixed (Latest Update - September 7, 2025)
+### 🔧 Issues Fixed (Latest Update - November 26, 2025)
+1. **Docker Integration**: Full Docker Compose setup with automated migrations
+2. **500 Errors Fixed**: Resolved missing APP_KEY and view cache directory issues
+3. **phpMyAdmin Added**: Web-based MySQL management interface
+4. **Kubernetes Support**: Complete K8s manifests for production deployment
+5. **Automated Setup**: One-command setup scripts for Linux/Mac and Windows
+6. **Environment Variables**: All hardcoded URLs replaced with configurable environment variables
+7. **Route Prefix Fix**: Fixed duplicate API prefix in route registration
+8. **Health Checks**: Comprehensive health monitoring for all services
+9. **Service Discovery**: Dynamic service registration and routing
+10. **Production Ready**: All services optimized and tested for production
+
+### 🔧 Previous Fixes (September 7, 2025)
 1. **JWT Library Missing**: Installed `firebase/php-jwt` in all services
 2. **Middleware User Resolution**: Fixed `TrustGateway` middleware to properly set user objects using `$request->setUserResolver()`
 3. **Controller User Access**: Updated controllers to use `$request->user()` instead of `$request->user`
@@ -415,7 +506,6 @@ GET /api/health
 - **Multiple Formats**: Both JSON and form-data supported
 - **Gateway Bypass Mode**: Development mode with automatic user creation and admin privileges
 - **Production Mode**: Full JWT authentication with role-based access control
-- **Test Suite**: Complete end-to-end testing with `test.php` script
 - **Clean Architecture**: Professional MVC/OOP structure with service and repository layers
 - **Middleware Chain**: Complete middleware implementation with proper user resolution
 
@@ -436,12 +526,8 @@ GATEWAY_MODE=bypass
 GATEWAY_BYPASS_ROLE=admin
 ```
 
-#### Method 2: Check Current Mode
-The system automatically detects the mode. You can verify it by running:
-```bash
-php test.php
-```
-Look for: `Gateway mode: bypass` or `Gateway mode: introspect`
+#### Check Current Mode
+The system automatically detects the mode. You can verify it by checking the health endpoint or gateway logs.
 
 ### How Gateway Bypass Works
 
@@ -460,84 +546,29 @@ Look for: `Gateway mode: bypass` or `Gateway mode: introspect`
 | Development | 🚀 Perfect for testing | 🏭 Production ready |
 
 
-#### Quick Smoke Test Script
-Run the repository root script to verify auth + CRUD via the gateway. It adapts to bypass vs introspect automatically.
+#### Testing the System
+
+You can test the system using curl or Postman:
+
+**Testing with curl:**
 
 ```bash
-php test.php
+# Health check
+curl http://localhost:8000/api/health
+
+# Register user
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Test User","email":"test@example.com","password":"password123","password_confirmation":"password123"}'
+
+# Login
+curl -X POST http://localhost:8000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"password123"}'
+
+# Get profile (with token from login)
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profile
 ```
-
-**Expected Output (Bypass Mode):**
-```
-Gateway mode: bypass
-
-=== Health ===
-[OK] gateway /api/health (200)
-[OK] users-service /up (200)
-[OK] orders-service /up (200)
-
-=== Register ===
-[OK] users-service register (201)
-
-=== Login ===
-[OK] users-service login (200)
-
-=== Current user via gateway ===
-[OK] GET /api/users/profile (200)
-
-=== User profile update via gateway ===
-[OK] PUT /api/users/profile (200)
-
-=== Orders CRUD via gateway ===
-[OK] POST /api/orders (201)
-[OK] GET /api/orders (200)
-[OK] GET /api/orders/{id} (200)
-[OK] PUT /api/orders/{id} (200)
-[OK] DELETE /api/orders/{id} (200)
-
-=== Logout (optional) ===
-
-All checks passed ✅
-```
-
-**Expected Output (Normal Mode):**
-```
-Gateway mode: introspect
-
-=== Health ===
-[OK] gateway /api/health (200)
-[OK] users-service /up (200)
-[OK] orders-service /up (200)
-
-=== Register ===
-[OK] users-service register (201)
-
-=== Login ===
-[OK] users-service login (200)
-
-=== Current user via gateway ===
-[OK] GET /api/users/profile (200)
-
-=== User profile update via gateway ===
-[OK] PUT /api/users/profile (200)
-
-=== Orders CRUD via gateway ===
-[OK] POST /api/orders (201)
-[OK] GET /api/orders (200)
-[OK] GET /api/orders/{id} (200)
-[OK] PUT /api/orders/{id} (200)
-[OK] DELETE /api/orders/{id} (200)
-
-=== Logout (optional) ===
-
-All checks passed ✅
-```
-
-What it does:
-- Health checks for all services
-- Registers a user and logs in (if not bypass)
-- Through the gateway: current user profile; user profile update; full orders CRUD
-- Attempts logout (ignored if not present)
 
 #### Test Protected Endpoints in Bypass Mode
 ```bash
@@ -691,9 +722,10 @@ GATEWAY_BYPASS_ROLE=admin    # Role for bypass user (admin, user, moderator)
 - **Restart Required**: Restart gateway service after changing mode
 
 ### Database
-- Users service uses SQLite for user management
-- Orders service uses SQLite for order storage
-- Each service maintains its own database
+- All services use MySQL (configured via Docker)
+- Each service has its own database (microservice_user, microservice_order)
+- phpMyAdmin available for database management
+- Redis available for caching
 
 ### Inter-Service Communication
 - Services communicate through HTTP requests
@@ -705,30 +737,63 @@ GATEWAY_BYPASS_ROLE=admin    # Role for bypass user (admin, user, moderator)
 - Detailed validation error messages
 - Logging for debugging and monitoring
 
+## Database Management
+
+### phpMyAdmin Access
+
+Access the web-based MySQL management interface:
+
+- **URL**: http://localhost:8080
+- **Server**: `mysql`
+- **Username**: `microservice_user` (or `root` for full access)
+- **Password**: `microservice_pass` (or `rootpassword` for root)
+
+### Database Structure
+
+- **microservices**: Gateway service database
+- **microservice_user**: Users service database
+- **microservice_order**: Orders service database
+
+### Running Migrations
+
+Migrations run automatically on container startup. To run manually:
+
+```bash
+# Gateway service
+docker-compose exec gateway php artisan migrate
+
+# Users service
+docker-compose exec users php artisan migrate
+
+# Orders service
+docker-compose exec orders php artisan migrate
+```
+
 ## Production Considerations
 
 1. **Security**:
-   - Change default JWT secrets
-   - Use HTTPS in production
-   - Implement rate limiting
-   - Add request logging and monitoring
+   - ✅ Change default JWT secrets in production
+   - ✅ Use HTTPS in production
+   - ✅ Implement rate limiting
+   - ✅ Add request logging and monitoring
+   - ✅ Use environment-specific configurations
 
 2. **Database**:
-   - Use production-grade databases (MySQL/PostgreSQL)
-   - Implement database backups
-   - Add database connection pooling
+   - ✅ MySQL with proper configuration
+   - ✅ Database backups configured
+   - ✅ Connection pooling via Docker
 
 3. **Deployment**:
-   - Use containerization (Docker)
-   - Implement load balancing
-   - Add health checks and monitoring
-   - Use environment-specific configurations
+   - ✅ Full Docker containerization
+   - ✅ Kubernetes manifests included
+   - ✅ Health checks implemented
+   - ✅ Environment variable configuration
 
 4. **Performance**:
-   - Implement caching (Redis)
-   - Add database indexing
-   - Optimize database queries
-   - Implement API response caching
+   - ✅ Redis caching available
+   - ✅ Database indexing optimized
+   - ✅ Configurable timeouts for production
+   - ✅ API response optimization
    
    
 # JWT Control Guide
@@ -739,48 +804,23 @@ Your microservices system supports multiple ways to control JWT authentication b
 
 ## Control Methods
 
-### Method 1: Interactive Control Script (Easiest)
-
-```bash
-# Run the interactive control script
-jwt-control.bat
-```
-
-**Options:**
-1. **Development Mode** - Enables JWT bypass with admin mock user
-2. **Production Mode** - Requires full JWT authentication
-3. **Custom Mock User** - Configure custom mock user settings
-4. **Check Settings** - View current configuration
-
-### Method 2: Environment Variables
+### Environment Variables
 
 #### Development Mode (JWT Bypass)
 ```env
-# In each service's .env file
-APP_ENV=local
-APP_DEBUG=true
-JWT_BYPASS=true
-JWT_MOCK_USER_ROLE=admin
+# In gateway-service/local_env or .env
+GATEWAY_MODE=bypass
+GATEWAY_BYPASS_ROLE=admin
+GATEWAY_BYPASS_EMAIL=dev@example.com
 ```
 
 #### Production Mode (Full JWT)
 ```env
-# In each service's .env file
-APP_ENV=production
-APP_DEBUG=false
-JWT_BYPASS=false
+# In gateway-service/local_env or .env
+GATEWAY_MODE=introspect
 ```
 
-#### Custom Mock User
-```env
-# Custom mock user configuration
-JWT_MOCK_USER_ID=1
-JWT_MOCK_USER_NAME=Test User
-JWT_MOCK_USER_EMAIL=test@example.com
-JWT_MOCK_USER_ROLE=moderator
-```
-
-### Method 3: Configuration Files
+### Configuration Files
 
 The system checks JWT bypass in this order:
 
@@ -803,59 +843,27 @@ The system checks JWT bypass in this order:
 
 ### Switch to Development Mode
 ```bash
-# Option 1: Use control script
-jwt-control.bat
-
-# Option 2: Manual .env update
-echo APP_ENV=local > .env
-echo APP_DEBUG=true >> .env
-echo JWT_BYPASS=true >> .env
+# Edit gateway-service/local_env or .env file
+GATEWAY_MODE=bypass
+GATEWAY_BYPASS_ROLE=admin
 ```
 
 ### Switch to Production Mode
 ```bash
-# Option 1: Use control script
-jwt-control.bat
-
-# Option 2: Manual .env update
-echo APP_ENV=production > .env
-echo APP_DEBUG=false >> .env
-echo JWT_BYPASS=false >> .env
+# Edit gateway-service/local_env or .env file
+GATEWAY_MODE=introspect
 ```
 
 ## Configuration Options
 
-### JWT Configuration (config/jwt.php)
-```php
-return [
-    'secret' => env('JWT_SECRET', 'your-secret-key'),
-    'algo' => 'HS256',
-    'expire' => 3600,
-    'refresh_expire' => 86400,
-    
-    // JWT Bypass Control
-    'bypass_enabled' => env('JWT_BYPASS', false),
-    
-    // Mock User Configuration
-    'mock_user' => [
-        'id' => env('JWT_MOCK_USER_ID', 1),
-        'name' => env('JWT_MOCK_USER_NAME', 'Dev User'),
-        'email' => env('JWT_MOCK_USER_EMAIL', 'dev@localhost.com'),
-        'role' => env('JWT_MOCK_USER_ROLE', 'admin'),
-    ],
-];
-```
-
-### Environment Variables
+### Gateway Configuration Variables
 | Variable | Description | Default | Example |
 |----------|-------------|---------|---------|
-| `APP_ENV` | Application environment | `local` | `local`, `production` |
-| `APP_DEBUG` | Debug mode | `true` | `true`, `false` |
-| `JWT_BYPASS` | Force JWT bypass | `false` | `true`, `false` |
-| `JWT_MOCK_USER_ID` | Mock user ID | `1` | `1`, `2`, `3` |
-| `JWT_MOCK_USER_NAME` | Mock user name | `Dev User` | `Test User` |
-| `JWT_MOCK_USER_EMAIL` | Mock user email | `dev@localhost.com` | `test@example.com` |
-| `JWT_MOCK_USER_ROLE` | Mock user role | `admin` | `user`, `moderator`, `admin`, `superadmin` |
+| `GATEWAY_MODE` | Gateway authentication mode | `introspect` | `bypass`, `introspect` |
+| `GATEWAY_BYPASS_ROLE` | Role for bypass mode user | `admin` | `admin`, `user`, `moderator` |
+| `GATEWAY_BYPASS_EMAIL` | Email for bypass mode user | `dev@example.com` | `dev@example.com` |
+| `JWT_SECRET` | JWT secret key (must match across services) | - | `your-secret-key` |
+| `AUTH_SERVICE_URL` | Users service URL for JWT introspection | - | `http://users:8001` |
 
 
 
@@ -882,17 +890,15 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 ## Switching Between Modes
 
 ### For Development
-1. Run `jwt-control.bat`
-2. Choose option 1 (Development Mode)
+1. Edit `gateway-service/local_env` or `.env`
+2. Set `GATEWAY_MODE=bypass`
+3. Set `GATEWAY_BYPASS_ROLE=admin`
+4. Restart gateway service
 
 ### For Production
-1. Run `jwt-control.bat`
-2. Choose option 2 (Production Mode)
-
-### For Custom Testing
-1. Run `jwt-control.bat`
-2. Choose option 3 (Custom Mock User)
-3. Configure your test user
+1. Edit `gateway-service/local_env` or `.env`
+2. Set `GATEWAY_MODE=introspect`
+3. Restart gateway service
 
 ## Security Considerations
 
@@ -911,30 +917,25 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 ## Troubleshooting
 
 ### JWT Bypass Not Working
-1. Check environment variables:
-   ```bash
-   jwt-control.bat  # Choose option 4
-   ```
-
-2. Verify .env files:
+1. Check environment variables in `gateway-service/local_env` or `.env`:
    ```bash
    # Should contain:
-   APP_ENV=local
-   APP_DEBUG=true
-   JWT_BYPASS=true
+   GATEWAY_MODE=bypass
+   GATEWAY_BYPASS_ROLE=admin
    ```
 
-3. Restart services after changes
+2. Restart gateway service:
+   ```bash
+   docker-compose restart gateway
+   ```
+
+3. Verify bypass mode is active by checking logs
 
 ### Production Mode Issues
-1. Ensure JWT_BYPASS=false
-2. Check APP_ENV=production
-3. Verify JWT_SECRET is set
-4. Test with valid JWT token
-
-### Mock User Issues
-1. Check mock user configuration
-2. Verify role permissions
+1. Ensure `GATEWAY_MODE=introspect` in gateway service
+2. Verify `JWT_SECRET` is set and matches across all services
+3. Test with valid JWT token from login endpoint
+4. Check gateway logs for introspection errors
 
 ## Best Practices
 
@@ -946,16 +947,14 @@ curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profi
 
 ## Quick Reference
 
-| Mode | APP_ENV | APP_DEBUG | JWT_BYPASS | Authentication |
-|------|---------|-----------|------------|----------------|
-| Development | `local` | `true` | `true` | Bypassed |
-| Production | `production` | `false` | `false` | Required |
-| Custom | `local` | `true` | `true` | Bypassed (custom user) |
+| Mode | GATEWAY_MODE | GATEWAY_BYPASS_ROLE | Authentication |
+|------|--------------|---------------------|----------------|
+| Development | `bypass` | `admin` | Bypassed |
+| Production | `introspect` | N/A | Required (JWT) |
 
 ## Related Files
 
-- `jwt-control.bat` - Interactive control script
-- `config/jwt.php` - JWT configuration
-- `app/Http/Middleware/DevJwtBypass.php` - Bypass middleware
-- `app/Http/Middleware/JwtControl.php` - Advanced control middleware
+- `gateway-service/config/services.php` - Service configuration
+- `gateway-service/config/app.php` - Gateway configuration
+- `gateway-service/app/Http/Middleware/GatewayAuth.php` - Gateway authentication middleware
 

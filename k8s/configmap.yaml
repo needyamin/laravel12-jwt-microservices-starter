@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: microservices
+data:
+  APP_ENV: "production"
+  APP_DEBUG: "false"
+  GATEWAY_MODE: "introspect"
+  GATEWAY_BYPASS_ROLE: "admin"
+  GATEWAY_BYPASS_EMAIL: "dev@example.com"
+  DB_CONNECTION: "mysql"
+  DB_HOST: "mysql"
+  DB_PORT: "3306"
+  DB_DATABASE: "microservices"
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-init
+  namespace: microservices
+data:
+  init.sql: |
+    CREATE DATABASE IF NOT EXISTS microservice_user;
+    CREATE DATABASE IF NOT EXISTS microservice_order;
+    CREATE DATABASE IF NOT EXISTS microservices;
+    GRANT ALL PRIVILEGES ON microservice_user.* TO 'microservice_user'@'%';
+    GRANT ALL PRIVILEGES ON microservice_order.* TO 'microservice_user'@'%';
+    GRANT ALL PRIVILEGES ON microservices.* TO 'microservice_user'@'%';
+    FLUSH PRIVILEGES;
+

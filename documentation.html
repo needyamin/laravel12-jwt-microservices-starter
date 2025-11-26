@@ -3,528 +3,1002 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Microservices System Documentation</title>
+    <title>Laravel 12 JWT Microservices - Complete Documentation</title>
     <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; background: #f5f5f5; }
-        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }
-        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
-        h2 { color: #34495e; margin-top: 30px; border-left: 4px solid #3498db; padding-left: 15px; }
-        h3 { color: #7f8c8d; margin-top: 25px; }
-        .code { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 5px; margin: 10px 0; overflow-x: auto; }
-        .highlight { background: #f39c12; color: white; padding: 2px 6px; border-radius: 3px; }
-        .success { background: #27ae60; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .warning { background: #e74c3c; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        .info { background: #3498db; color: white; padding: 10px; border-radius: 5px; margin: 10px 0; }
-        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
-        th { background: #34495e; color: white; }
-        .toc { background: #ecf0f1; padding: 20px; border-radius: 5px; margin: 20px 0; }
-        .toc ul { list-style-type: none; padding-left: 0; }
-        .toc li { margin: 5px 0; }
-        .toc a { text-decoration: none; color: #2c3e50; }
-        .toc a:hover { color: #3498db; }
-        .endpoint { background: #e8f5e8; padding: 10px; border-left: 4px solid #27ae60; margin: 10px 0; }
-        .method { display: inline-block; padding: 3px 8px; border-radius: 3px; font-weight: bold; margin-right: 10px; }
-        .get { background: #27ae60; color: white; }
-        .post { background: #3498db; color: white; }
-        .put { background: #f39c12; color: white; }
-        .delete { background: #e74c3c; color: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        nav {
+            background: #2d3748;
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        section {
+            margin-bottom: 4rem;
+            scroll-margin-top: 80px;
+        }
+        
+        section h1 {
+            font-size: 2.5rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        section h2 {
+            font-size: 2rem;
+            color: #4a5568;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        section h3 {
+            font-size: 1.5rem;
+            color: #718096;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        section h4 {
+            font-size: 1.25rem;
+            color: #a0aec0;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        ul, ol {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+        
+        li {
+            margin-bottom: 0.5rem;
+        }
+        
+        code {
+            background: #f7fafc;
+            padding: 0.2rem 0.4rem;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e53e3e;
+        }
+        
+        pre {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+        
+        pre code {
+            background: none;
+            color: inherit;
+            padding: 0;
+        }
+        
+        blockquote {
+            border-left: 4px solid #667eea;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #718096;
+            font-style: italic;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+        
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        th {
+            background: #f7fafc;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        tr:hover {
+            background: #f7fafc;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .badge-info {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        
+        .badge-warning {
+            background: #feebc8;
+            color: #7c2d12;
+        }
+        
+        .alert {
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+        }
+        
+        .alert-info {
+            background: #bee3f8;
+            color: #2c5282;
+            border-left: 4px solid #3182ce;
+        }
+        
+        .alert-success {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #38a169;
+        }
+        
+        .alert-warning {
+            background: #feebc8;
+            color: #7c2d12;
+            border-left: 4px solid #dd6b20;
+        }
+        
+        footer {
+            background: #2d3748;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+            }
+            
+            header h1 {
+                font-size: 1.8rem;
+            }
+            
+            section h1 {
+                font-size: 2rem;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🚀 Laravel 12 JWT Microservices Starter</h1>
-        <div class="success">
-            <strong>✅ FULLY FUNCTIONAL!</strong> All CRUD operations and authentication endpoints are working perfectly!
-        </div>
+        <header>
+            <h1>Laravel 12 JWT Microservices</h1>
+            <p>Complete Documentation & Architecture Guide</p>
+        </header>
         
-        <div class="toc">
-            <h3>📋 Table of Contents</h3>
+        <nav>
             <ul>
-                <li><a href="#overview">System Overview</a></li>
                 <li><a href="#architecture">Architecture</a></li>
-                <li><a href="#quick-start">Quick Start Guide</a></li>
-                <li><a href="#development">Development Mode</a></li>
-                <li><a href="#api-reference">API Reference</a></li>
-                <li><a href="#security">Security Features</a></li>
-                <li><a href="#adding-services">Adding New Services</a></li>
-                <li><a href="#troubleshooting">Troubleshooting</a></li>
-                <li><a href="#production">Production Deployment</a></li>
+                <li><a href="#structure">Structure Improvements</a></li>
+                <li><a href="#environment">Environment Configuration</a></li>
+                <li><a href="#services">Adding Services</a></li>
             </ul>
-        </div>
-
-        <h2 id="overview">🎯 System Overview</h2>
-        <p>This is a fully functional Laravel 12-based microservices architecture with JWT authentication, featuring:</p>
-        <ul>
-            <li><strong>Gateway Service</strong> - API Gateway with JWT validation and request routing</li>
-            <li><strong>Users Service</strong> - User management and JWT authentication</li>
-            <li><strong>Orders Service</strong> - Order management with role-based access</li>
-        </ul>
-
-        <div class="success">
-            <strong>✅ Current Status:</strong> All systems operational! Authentication, CRUD operations, and API gateway working perfectly.
-        </div>
-
-        <div class="info">
-            <strong>💡 Key Features:</strong> JWT Authentication, Role-Based Access Control, Development Bypass, Security Headers, Input Validation, XSS Protection, JSON & Form-Data Support
-        </div>
-
-        <h2 id="architecture">🏗️ Architecture</h2>
-        <div class="code">
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Gateway       │    │   Users         │    │   Orders        │
-│   Service       │    │   Service       │    │   Service       │
-│   Port: 8000    │    │   Port: 8001    │    │   Port: 8002    │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                    ┌─────────────────┐
-                    │   Client        │
-                    │   Application   │
-                    └─────────────────┘
-        </div>
-
-        <h3>Service Responsibilities</h3>
-        <table>
-            <tr><th>Service</th><th>Port</th><th>Responsibilities</th></tr>
-            <tr><td>Gateway</td><td>8000</td><td>JWT validation, request routing, security headers</td></tr>
-            <tr><td>Users</td><td>8001</td><td>Authentication, user management, JWT generation</td></tr>
-            <tr><td>Orders</td><td>8002</td><td>Order CRUD, status management, user filtering</td></tr>
-        </table>
-
-        <h2 id="quick-start">⚡ Quick Start Guide</h2>
+        </nav>
         
-        <h3>Prerequisites</h3>
-        <ul>
-            <li>PHP 8.2+</li>
-            <li>Composer</li>
-            <li>SQLite (or MySQL/PostgreSQL)</li>
-            <li>Firebase JWT library (automatically installed)</li>
-        </ul>
+        <div class="content">
+            <!-- Architecture Section -->
+            <section id="architecture">
+                <h1>Microservices Architecture</h1>
+                
+                <h2>Overview</h2>
+                <p>This microservices architecture is designed with <strong>scalability</strong> and <strong>ease of extension</strong> in mind. The gateway service acts as a central entry point that routes requests to appropriate microservices based on configuration.</p>
+                
+                <h2>Architecture Components</h2>
+                
+                <h3>1. Gateway Service</h3>
+                <p>The gateway service is the single entry point for all client requests. It handles:</p>
+                <ul>
+                    <li><strong>Request Routing</strong>: Routes requests to appropriate microservices</li>
+                    <li><strong>JWT Authentication</strong>: Validates JWT tokens before forwarding requests</li>
+                    <li><strong>Role-Based Access Control</strong>: Enforces role-based permissions</li>
+                    <li><strong>Health Monitoring</strong>: Monitors all registered services</li>
+                    <li><strong>Service Discovery</strong>: Dynamically discovers services from configuration</li>
+                </ul>
+                
+                <h4>Key Files</h4>
+                <ul>
+                    <li><code>app/Services/ServiceRegistry.php</code> - Service registry and discovery</li>
+                    <li><code>app/Services/RouteConfig.php</code> - Dynamic route registration</li>
+                    <li><code>app/Services/ProxyService.php</code> - Request forwarding logic</li>
+                    <li><code>app/Http/Controllers/GatewayController.php</code> - Main gateway controller</li>
+                    <li><code>config/services.php</code> - Service configuration (add new services here!)</li>
+                </ul>
+                
+                <h3>2. Microservices</h3>
+                <p>Each microservice is an independent Laravel application that:</p>
+                <ul>
+                    <li>Handles its own domain logic</li>
+                    <li>Maintains its own database</li>
+                    <li>Exposes RESTful APIs</li>
+                    <li>Implements <code>TrustGateway</code> middleware for gateway integration</li>
+                </ul>
+                
+                <h4>Current Services</h4>
+                <ul>
+                    <li><strong>Users Service</strong> (Port 8001): User management and authentication</li>
+                    <li><strong>Orders Service</strong> (Port 8002): Order management</li>
+                </ul>
+                
+                <h2>Service Registration System</h2>
+                
+                <h3>Configuration-Driven Architecture</h3>
+                <p>Services are registered through configuration files, not code. This makes adding new services as simple as adding a configuration entry.</p>
+                
+                <h3>Service Registry</h3>
+                <p>The <code>ServiceRegistry</code> class provides a centralized way to:</p>
+                <ul>
+                    <li>Get all registered services</li>
+                    <li>Get service configuration</li>
+                    <li>Check if a service exists</li>
+                    <li>Get service URLs and routes</li>
+                    <li>Register services dynamically</li>
+                </ul>
+                
+                <h3>Route Configuration</h3>
+                <p>Routes are automatically registered from service configurations. Each route definition includes:</p>
+                <ul>
+                    <li><strong>Gateway Path</strong>: The path clients use to access the service</li>
+                    <li><strong>Service Path</strong>: The actual path on the target service</li>
+                    <li><strong>HTTP Methods</strong>: Allowed methods (GET, POST, PUT, DELETE, etc.)</li>
+                    <li><strong>Middleware</strong>: Middleware to apply (authentication, roles, etc.)</li>
+                </ul>
+                
+                <h2>Adding New Services</h2>
+                
+                <h3>Step 1: Add Service Configuration</h3>
+                <p>Edit <code>gateway-service/config/services.php</code>:</p>
+                <pre><code>'new-service' => [
+    'url' => env('NEW_SERVICE_URL', 'http://localhost:8003'),
+    'health_endpoint' => '/api/health',
+    'description' => 'New service description',
+    'routes' => [
+        // Define your routes here
+    ],
+],</code></pre>
+                
+                <h3>Step 2: Set Environment Variable</h3>
+                <p>Add to <code>gateway-service/.env</code>:</p>
+                <pre><code>NEW_SERVICE_URL=http://localhost:8003</code></pre>
+                
+                <h3>Step 3: Done!</h3>
+                <p>The gateway automatically:</p>
+                <ul>
+                    <li>Registers all routes</li>
+                    <li>Includes the service in health checks</li>
+                    <li>Enables dynamic routing</li>
+                </ul>
+                
+                <h2>Request Flow</h2>
+                <pre><code>Client Request
+    ↓
+Gateway Service (Port 8000)
+    ├─ JWT Validation (if required)
+    ├─ Role Check (if required)
+    ├─ Service Lookup
+    └─ Request Forwarding
+         ↓
+Target Microservice
+    ├─ TrustGateway Middleware
+    ├─ Business Logic
+    └─ Response
+         ↓
+Gateway Service
+    └─ Response to Client</code></pre>
+                
+                <h2>Service Communication</h2>
+                
+                <h3>Gateway → Service</h3>
+                <p>The gateway forwards requests with these headers:</p>
+                <ul>
+                    <li><code>X-User-Id</code>: Authenticated user ID</li>
+                    <li><code>X-User-Email</code>: Authenticated user email</li>
+                    <li><code>X-User-Role</code>: User role</li>
+                    <li><code>X-Bypass-Mode</code>: Bypass mode indicator (development)</li>
+                </ul>
+                
+                <h3>Service → Gateway</h3>
+                <p>Services respond with standard HTTP responses that the gateway forwards to clients.</p>
+                
+                <h2>Health Checks</h2>
+                <p>All services are automatically included in the gateway health check:</p>
+                <pre><code>GET /api/health</code></pre>
+                <p>Response includes:</p>
+                <ul>
+                    <li>Gateway status</li>
+                    <li>All service statuses</li>
+                    <li>Response times</li>
+                    <li>Service URLs and descriptions</li>
+                </ul>
+                
+                <h2>Development Tools</h2>
+                
+                <h3>Artisan Commands</h3>
+                <pre><code># List all registered services
+php artisan gateway:services
 
-        <h3>1. Setup</h3>
-        <div class="code"># Run the setup script
-setup.bat
+# Show details for a specific service
+php artisan gateway:service {name}</code></pre>
+                
+                <h3>Service Template</h3>
+                <p>Use <code>gateway-service/SERVICE-TEMPLATE.php</code> as a starting point for new services.</p>
+                
+                <h2>Best Practices</h2>
+                <ol>
+                    <li><strong>Use Environment Variables</strong>: Always use env vars for service URLs</li>
+                    <li><strong>Descriptive Names</strong>: Use clear, descriptive service names</li>
+                    <li><strong>RESTful Routes</strong>: Follow REST conventions for route paths</li>
+                    <li><strong>Health Endpoints</strong>: Always implement health check endpoints</li>
+                    <li><strong>Error Handling</strong>: Implement proper error handling in services</li>
+                    <li><strong>Logging</strong>: Use consistent logging across services</li>
+                    <li><strong>Documentation</strong>: Document your service in the configuration</li>
+                </ol>
+                
+                <h2>Security</h2>
+                <ul>
+                    <li><strong>JWT Authentication</strong>: All protected routes require valid JWT tokens</li>
+                    <li><strong>Role-Based Access</strong>: Routes can require specific roles</li>
+                    <li><strong>Gateway Trust</strong>: Services trust the gateway via <code>TrustGateway</code> middleware</li>
+                    <li><strong>Bypass Mode</strong>: Development mode for local testing (never use in production)</li>
+                </ul>
+                
+                <h2>Scalability</h2>
+                <p>The architecture supports:</p>
+                <ul>
+                    <li><strong>Horizontal Scaling</strong>: Add multiple instances of services</li>
+                    <li><strong>Service Isolation</strong>: Each service is independent</li>
+                    <li><strong>Dynamic Registration</strong>: Add services without code changes</li>
+                    <li><strong>Load Balancing</strong>: Gateway can be load balanced</li>
+                    <li><strong>Service Discovery</strong>: Easy to integrate with service discovery systems</li>
+                </ul>
+                
+                <h2>Future Enhancements</h2>
+                <p>Potential improvements:</p>
+                <ul>
+                    <li>Service discovery via Consul/etcd</li>
+                    <li>Circuit breakers for resilience</li>
+                    <li>Request/response caching</li>
+                    <li>Rate limiting per service</li>
+                    <li>API versioning</li>
+                    <li>GraphQL gateway support</li>
+                    <li>WebSocket support</li>
+                </ul>
+            </section>
+            
+            <!-- Structure Improvements Section -->
+            <section id="structure">
+                <h1>Microservices Structure Improvements</h1>
+                
+                <h2>Summary</h2>
+                <p>The microservices architecture has been restructured to make adding new services <strong>extremely easy</strong>. The system is now configuration-driven, meaning you can add new services by simply editing a configuration file instead of modifying code.</p>
+                
+                <h2>What Changed</h2>
+                
+                <h3>1. Service Registry System</h3>
+                <p><strong>New File</strong>: <code>gateway-service/app/Services/ServiceRegistry.php</code></p>
+                <ul>
+                    <li>Centralized service management</li>
+                    <li>Dynamic service discovery</li>
+                    <li>Easy service lookup and validation</li>
+                </ul>
+                
+                <h3>2. Configuration-Driven Routes</h3>
+                <p><strong>New File</strong>: <code>gateway-service/app/Services/RouteConfig.php</code></p>
+                <ul>
+                    <li>Automatic route registration from configuration</li>
+                    <li>Routes grouped by middleware for efficiency</li>
+                    <li>Dynamic parameter forwarding</li>
+                </ul>
+                
+                <h3>3. Enhanced Services Configuration</h3>
+                <p><strong>Updated</strong>: <code>gateway-service/config/services.php</code></p>
+                <ul>
+                    <li>Structured service definitions</li>
+                    <li>Route definitions with middleware</li>
+                    <li>Health check endpoints</li>
+                    <li>Service descriptions</li>
+                </ul>
+                
+                <h3>4. Simplified Routes File</h3>
+                <p><strong>Updated</strong>: <code>gateway-service/routes/api.php</code></p>
+                <ul>
+                    <li>Reduced from 116 lines to 26 lines</li>
+                    <li>All routes now auto-registered from config</li>
+                    <li>No need to manually add routes for new services</li>
+                </ul>
+                
+                <h3>5. Enhanced Gateway Controller</h3>
+                <p><strong>Updated</strong>: <code>gateway-service/app/Http/Controllers/GatewayController.php</code></p>
+                <ul>
+                    <li>Uses ServiceRegistry instead of hardcoded services</li>
+                    <li>Better error messages</li>
+                    <li>Improved health check with service descriptions</li>
+                </ul>
+                
+                <h3>6. Artisan Commands</h3>
+                <p><strong>Updated</strong>: <code>gateway-service/routes/console.php</code></p>
+                <ul>
+                    <li><code>php artisan gateway:services</code> - List all registered services</li>
+                    <li><code>php artisan gateway:service {name}</code> - Show service details</li>
+                </ul>
+                
+                <h2>Benefits</h2>
+                
+                <h3>Before (Old Structure)</h3>
+                <p>To add a new service, you had to:</p>
+                <ol>
+                    <li>Edit <code>GatewayController.php</code> to add service URL</li>
+                    <li>Manually add routes in <code>routes/api.php</code></li>
+                    <li>Update health check logic</li>
+                    <li>Update catch-all route pattern</li>
+                    <li>Test everything manually</li>
+                </ol>
+                
+                <h3>After (New Structure)</h3>
+                <p>To add a new service, you only need to:</p>
+                <ol>
+                    <li>Add service configuration to <code>config/services.php</code></li>
+                    <li>Set environment variable</li>
+                    <li><strong>Done!</strong> Routes are auto-registered</li>
+                </ol>
+                
+                <h2>Example: Adding a "Products" Service</h2>
+                
+                <h3>Step 1: Add to <code>config/services.php</code></h3>
+                <pre><code>'products' => [
+    'url' => env('PRODUCTS_SERVICE_URL', 'http://localhost:8003'),
+    'health_endpoint' => '/api/health',
+    'description' => 'Product catalog service',
+    'routes' => [
+        [
+            'path' => 'products',
+            'service_path' => 'api/products',
+            'methods' => ['GET', 'POST'],
+            'middleware' => ['gateway.auth'],
+        ],
+        // ... more routes
+    ],
+],</code></pre>
+                
+                <h3>Step 2: Add to <code>.env</code></h3>
+                <pre><code>PRODUCTS_SERVICE_URL=http://localhost:8003</code></pre>
+                
+                <h3>Step 3: Done!</h3>
+                <p>The gateway automatically:</p>
+                <ul>
+                    <li>✅ Registers all routes</li>
+                    <li>✅ Includes in health checks</li>
+                    <li>✅ Enables dynamic routing</li>
+                    <li>✅ Applies middleware correctly</li>
+                </ul>
+                
+                <h2>Files Created</h2>
+                <ol>
+                    <li><code>gateway-service/app/Services/ServiceRegistry.php</code> - Service registry</li>
+                    <li><code>gateway-service/app/Services/RouteConfig.php</code> - Route configuration</li>
+                    <li><code>gateway-service/README-SERVICES.md</code> - Service addition guide</li>
+                    <li><code>gateway-service/SERVICE-TEMPLATE.php</code> - Service template</li>
+                    <li><code>ARCHITECTURE.md</code> - Architecture documentation</li>
+                </ol>
+                
+                <h2>Files Modified</h2>
+                <ol>
+                    <li><code>gateway-service/config/services.php</code> - Restructured with microservices config</li>
+                    <li><code>gateway-service/routes/api.php</code> - Simplified to use RouteConfig</li>
+                    <li><code>gateway-service/app/Http/Controllers/GatewayController.php</code> - Uses ServiceRegistry</li>
+                    <li><code>gateway-service/routes/console.php</code> - Added service management commands</li>
+                    <li><code>README.md</code> - Added reference to new structure</li>
+                </ol>
+                
+                <h2>Backward Compatibility</h2>
+                <div class="alert alert-success">
+                    <strong>✅ Fully backward compatible</strong>
+                    <ul>
+                        <li>All existing routes still work</li>
+                        <li>No breaking changes to API</li>
+                        <li>Existing services continue to function</li>
+                        <li>Health checks work as before</li>
+                    </ul>
+                </div>
+                
+                <h2>Testing</h2>
+                <p>Test the new structure:</p>
+                <pre><code># List all services
+php artisan gateway:services
 
-# Or manually:
-cd gateway-service && composer install && composer require firebase/php-jwt
-cd ../users-service && composer install && composer require firebase/php-jwt
-cd ../orders-service && composer install && composer require firebase/php-jwt</div>
+# Check specific service
+php artisan gateway:service users
 
-        <h3>2. Start Services</h3>
-        <div class="code"># Start all services at once
-start-all.bat
+# Test health endpoint
+curl http://localhost:8000/api/health</code></pre>
+            </section>
+            
+            <!-- Environment Configuration Section -->
+            <section id="environment">
+                <h1>Environment Configuration Guide</h1>
+                
+                <p>All services are now fully configurable through environment variables. No hardcoded localhost or IP addresses remain in the codebase.</p>
+                
+                <h2>Quick Start</h2>
+                <ol>
+                    <li>Copy <code>local_env</code> to <code>.env</code> in each service directory</li>
+                    <li>Update the service URLs and ports as needed</li>
+                    <li>All services will automatically use the configured values</li>
+                </ol>
+                
+                <h2>Environment Variables</h2>
+                
+                <h3>Gateway Service</h3>
+                <p><strong>File</strong>: <code>gateway-service/.env</code> or <code>gateway-service/local_env</code></p>
+                <pre><code># Application
+APP_URL=${GATEWAY_URL:-http://localhost:8000}
+GATEWAY_URL=http://localhost:8000
+GATEWAY_HOST=localhost
+GATEWAY_PORT=8000
 
-# Or start individually:
-start-gateway.bat    # Port 8000
-start-users.bat      # Port 8001  
-start-orders.bat     # Port 8002</div>
+# Service URLs
+USERS_SERVICE_URL=http://localhost:8001
+ORDERS_SERVICE_URL=http://localhost:8002
+AUTH_SERVICE_URL=${USERS_SERVICE_URL}
 
-        <div class="success">
-            <strong>✅ Success!</strong> Your microservices system is now running. Access the gateway at <a href="http://localhost:8000">http://localhost:8000</a>
-        </div>
+# Gateway Configuration
+GATEWAY_MODE=introspect  # or 'bypass' for development
+GATEWAY_BYPASS_ROLE=admin
+GATEWAY_BYPASS_EMAIL=dev@example.com
+GATEWAY_TIMEOUT=3.0
+GATEWAY_PROXY_TIMEOUT=30
+GATEWAY_CONNECT_TIMEOUT=5
 
-        <h2 id="recent-fixes">🔧 Recent Fixes and Improvements</h2>
-        
-        <h3>Issues Fixed</h3>
-        <ul>
-            <li><strong>JWT Library Missing</strong> - Installed <code>firebase/php-jwt</code> in all services</li>
-            <li><strong>Middleware User Resolution</strong> - Fixed <code>DevJwtBypass</code> middleware to properly set user objects</li>
-            <li><strong>Controller User Access</strong> - Updated controllers to use <code>$request->user()</code> instead of <code>$request->user</code></li>
-            <li><strong>Gateway Data Forwarding</strong> - Fixed gateway to properly forward both JSON and form-data</li>
-            <li><strong>Password Hashing</strong> - Removed double-hashing in AuthController (Laravel 11's <code>hashed</code> cast handles it)</li>
-            <li><strong>User Model Fields</strong> - Added <code>is_active</code> field to the orders-service User model</li>
-            <li><strong>Form-Data Support</strong> - Gateway now properly forwards form-data by converting it to JSON</li>
-        </ul>
+# JWT
+JWT_SECRET=your-secret-key-change-this-in-production</code></pre>
+                
+                <h3>Users Service</h3>
+                <p><strong>File</strong>: <code>users-service/.env</code> or <code>users-service/local_env</code></p>
+                <pre><code># Application
+APP_URL=${USERS_SERVICE_URL:-http://localhost:8001}
+USERS_SERVICE_URL=http://localhost:8001
+USERS_SERVICE_HOST=localhost
+USERS_SERVICE_PORT=8001
 
-        <h3>Current Working Features</h3>
-        <div class="success">
-            <ul>
-                <li><strong>Authentication</strong> - Register, login, JWT tokens, refresh, logout</li>
-                <li><strong>User Management</strong> - Profile management, admin user operations</li>
-                <li><strong>Order Management</strong> - Full CRUD operations, status updates, admin operations</li>
-                <li><strong>API Gateway</strong> - Proper request routing and data forwarding</li>
-                <li><strong>Multiple Formats</strong> - Both JSON and form-data supported</li>
-                <li><strong>Development Mode</strong> - JWT bypass for local development</li>
-                <li><strong>Production Mode</strong> - Full JWT authentication</li>
-            </ul>
-        </div>
+# JWT
+JWT_SECRET=your-secret-key-change-this-in-production</code></pre>
+                
+                <h3>Orders Service</h3>
+                <p><strong>File</strong>: <code>orders-service/.env</code> or <code>orders-service/local_env</code></p>
+                <pre><code># Application
+APP_URL=${ORDERS_SERVICE_URL:-http://localhost:8002}
+ORDERS_SERVICE_URL=http://localhost:8002
+ORDERS_SERVICE_HOST=localhost
+ORDERS_SERVICE_PORT=8002
 
-        <h2 id="development">🛠️ Development Mode</h2>
-        
-        <p>The system includes a <span class="highlight">JWT bypass</span> for local development that automatically authenticates requests.</p>
-
-        <h3>How It Works</h3>
-        <ul>
-            <li>Automatically enabled when <code>APP_ENV=local</code> and <code>APP_DEBUG=true</code></li>
-            <li>Creates a mock admin user for all requests</li>
-            <li>Bypasses JWT token validation</li>
-            <li>Grants admin privileges for testing</li>
-        </ul>
-
-        <h3>Development Testing</h3>
-        <div class="code"># Test without authentication
-curl http://localhost:8000/api/users/profile
-
-# Create orders without token
-curl -X POST http://localhost:8000/api/orders \
-  -H "Content-Type: application/json" \
-  -d '{"total_amount": 99.99, "shipping_address": {...}}'
-
-# Access admin endpoints
-curl http://localhost:8000/api/users
-curl http://localhost:8000/api/orders/admin/all</div>
-
-        <div class="info">
-            <strong>🔧 Mock User:</strong> ID: 1, Name: "Dev User", Email: "dev@localhost.com", Role: "admin"
-        </div>
-
-        <h2 id="api-reference">📚 API Reference</h2>
-
-        <h3>Authentication Endpoints</h3>
-        
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/auth/register</strong>
-            <p>Register a new user (Supports both JSON and Form-Data)</p>
-            <div class="code"># JSON Format (Recommended)
-{
-  "name": "John Doe",
-  "email": "john@example.com", 
-  "password": "password123",
-  "password_confirmation": "password123",
-  "role": "user"
-}
-
-# Form-Data Format (Also Supported)
-name: John Doe
-email: john@example.com
-password: password123
-password_confirmation: password123
-role: user</div>
-        </div>
-
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/auth/login</strong>
-            <p>Login user and get JWT token (Supports both JSON and Form-Data)</p>
-            <div class="code"># JSON Format (Recommended)
-{
-  "email": "john@example.com",
-  "password": "password123"
-}
-
-# Form-Data Format (Also Supported)
-email: john@example.com
-password: password123</div>
-        </div>
-
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/auth/refresh</strong>
-            <p>Refresh JWT token</p>
-            <div class="code">Authorization: Bearer &lt;token&gt;</div>
-        </div>
-
-        <h3>User Management</h3>
-        
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/users/profile</strong>
-            <p>Get current user profile</p>
-        </div>
-
-        <div class="endpoint">
-            <span class="method put">PUT</span> <strong>/api/users/profile</strong>
-            <p>Update user profile</p>
-        </div>
-
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/users</strong>
-            <p>Get all users (Admin only)</p>
-        </div>
-
-        <h3>Order Management</h3>
-        
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/orders</strong>
-            <p>Get user's orders</p>
-        </div>
-
-        <div class="endpoint">
-            <span class="method post">POST</span> <strong>/api/orders</strong>
-            <p>Create new order</p>
-            <div class="code">{
-  "total_amount": 99.99,
-  "currency": "USD",
-  "shipping_address": {
-    "name": "John Doe",
-    "street": "123 Main St",
-    "city": "New York", 
-    "state": "NY",
-    "postal_code": "10001",
-    "country": "USA"
-  },
-  "notes": "Please deliver after 5 PM"
-}</div>
-        </div>
-
-        <div class="endpoint">
-            <span class="method put">PUT</span> <strong>/api/orders/{id}/status</strong>
-            <p>Update order status (Moderator/Admin only)</p>
-        </div>
-
-        <h3>Health Check</h3>
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/api/health</strong>
-            <p>Check system health status</p>
-        </div>
-
-        <h3>Postman Usage</h3>
-        
-        <h4>JSON Format (Recommended)</h4>
-        <div class="code">1. Method: POST
-2. URL: http://localhost:8000/api/auth/register
-3. Headers: 
-   - Content-Type: application/json
-   - Accept: application/json
-4. Body: Select "raw" → "JSON"
-5. JSON Body:
-{
-    "name": "Test User",
-    "email": "test@example.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-}</div>
-
-        <h4>Form-Data Format (Also Supported)</h4>
-        <div class="code">1. Method: POST
-2. URL: http://localhost:8000/api/auth/register
-3. Headers: 
-   - Accept: application/json
-4. Body: Select "form-data"
-5. Form Fields:
-   - name: Test User
-   - email: test@example.com
-   - password: password123
-   - password_confirmation: password123</div>
-
-        <h2 id="security">🔒 Security Features</h2>
-
-        <h3>JWT Authentication</h3>
-        <ul>
-            <li>Secure token-based authentication</li>
-            <li>Token expiration and refresh mechanism</li>
-            <li>Role-based access control</li>
-        </ul>
-
-        <h3>Input Validation</h3>
-        <ul>
-            <li>Comprehensive request validation</li>
-            <li>SQL injection prevention via Eloquent ORM</li>
-            <li>XSS protection through input sanitization</li>
-        </ul>
-
-        <h3>Security Headers</h3>
-        <div class="code">X-Content-Type-Options: nosniff
-X-Frame-Options: DENY
-X-XSS-Protection: 1; mode=block
-Referrer-Policy: strict-origin-when-cross-origin
-Content-Security-Policy: default-src 'self'</div>
-
-        <h3>Role-Based Access Control</h3>
-        <table>
-            <tr><th>Role</th><th>Permissions</th></tr>
-            <tr><td>user</td><td>Own orders and profile</td></tr>
-            <tr><td>moderator</td><td>Manage order statuses, view all orders</td></tr>
-            <tr><td>admin</td><td>Full user and order management</td></tr>
-            <tr><td>superadmin</td><td>Highest level access</td></tr>
-        </table>
-
-        <h2 id="adding-services">➕ Adding New Services</h2>
-
-        <h3>Step 1: Create Service Directory</h3>
-        <div class="code">mkdir new-service
-cd new-service
-composer create-project laravel/laravel . --prefer-dist</div>
-
-        <h3>Step 2: Install Dependencies</h3>
-        <div class="code">composer require firebase/php-jwt</div>
-
-        <h3>Step 3: Create Middleware</h3>
-        <div class="code"># Copy DevJwtBypass.php from existing service
-# Update the middleware for your service needs</div>
-
-        <h3>Step 4: Configure Bootstrap</h3>
-        <div class="code"># In bootstrap/app.php
-->withRouting(
-    web: __DIR__.'/../routes/web.php',
-    api: __DIR__.'/../routes/api.php',
-    commands: __DIR__.'/../routes/console.php',
-    health: '/up',
-)
-->withMiddleware(function (Middleware $middleware): void {
-    $middleware->alias([
-        'jwt' => \App\Http\Middleware\JwtMiddleware::class,
-        'dev.jwt' => \App\Http\Middleware\DevJwtBypass::class,
-    ]);
-})</div>
-
-        <h3>Step 5: Create API Routes</h3>
-        <div class="code"># In routes/api.php
-Route::get('/health', function () {
-    return response()->json([
-        'service' => 'new-service',
-        'status' => 'up',
-        'timestamp' => now()
-    ]);
-});
-
-Route::middleware([\App\Http\Middleware\DevJwtBypass::class])->group(function () {
-    // Your protected routes here
-});</div>
-
-        <h3>Step 6: Update Gateway</h3>
-        <div class="code"># In gateway-service/app/Http/Controllers/GatewayController.php
-private $services = [
-    'users' => 'http://localhost:8001',
-    'orders' => 'http://localhost:8002',
-    'new-service' => 'http://localhost:8003',  // Add your service
-];</div>
-
-        <h3>Step 7: Add Gateway Routes</h3>
-        <div class="code"># In gateway-service/routes/api.php
-Route::prefix('new-service')->group(function () {
-    Route::get('/', function (Request $request) {
-        return app(GatewayController::class)->route($request, 'new-service', '');
-    });
-    // Add more routes as needed
-});</div>
-
-        <h3>Step 8: Create Startup Script</h3>
-        <div class="code"># Create start-new-service.bat
-@echo off
-echo Starting New Service on Port 8003...
-cd new-service
-php artisan serve --port=8003
-pause</div>
-
-        <div class="success">
-            <strong>✅ New Service Added!</strong> Your service is now integrated into the microservices architecture.
-        </div>
-
-        <h2 id="troubleshooting">🔧 Troubleshooting</h2>
-
-        <h3>Common Issues (All Fixed!)</h3>
-
-        <h4>✅ JWT Library Missing (FIXED)</h4>
-        <div class="success">
-            <strong>Issue:</strong> "Class Firebase\JWT\JWT not found"<br>
-            <strong>Solution:</strong> Firebase JWT library is now automatically installed in all services
-        </div>
-
-        <h4>✅ 422 Validation Errors (FIXED)</h4>
-        <div class="success">
-            <strong>Issue:</strong> "The name field is required" for form-data<br>
-            <strong>Solution:</strong> Gateway now properly forwards both JSON and form-data
-        </div>
-
-        <h4>✅ User Object Access (FIXED)</h4>
-        <div class="success">
-            <strong>Issue:</strong> "Attempt to read property 'id' on array"<br>
-            <strong>Solution:</strong> Middleware now properly sets user objects using setUserResolver()
-        </div>
-
-        <h4>Service Won't Start</h4>
-        <div class="warning">
-            <strong>Issue:</strong> "Port already in use"<br>
-            <strong>Solution:</strong> Check if another service is using the port, or change the port number
-        </div>
-
-        <h4>Database Connection Error</h4>
-        <div class="warning">
-            <strong>Issue:</strong> "could not find driver"<br>
-            <strong>Solution:</strong> Install SQLite extension: <code>php -m | grep sqlite</code>
-        </div>
-
-        <h4>JWT Token Issues</h4>
-        <div class="warning">
-            <strong>Issue:</strong> "Token not provided"<br>
-            <strong>Solution:</strong> Ensure you're in development mode or provide valid JWT token
-        </div>
-
-        <h4>Service Communication Error</h4>
-        <div class="warning">
-            <strong>Issue:</strong> "Service temporarily unavailable"<br>
-            <strong>Solution:</strong> Check if all services are running and accessible
-        </div>
-
-        <h3>Debug Commands</h3>
-        <div class="code"># Check service health
-curl http://localhost:8000/api/health
-
-# Test individual services
-curl http://localhost:8001/api/health  # Users service
-curl http://localhost:8002/api/health  # Orders service
-
-# Check Laravel logs
-tail -f gateway-service/storage/logs/laravel.log
-tail -f users-service/storage/logs/laravel.log
-tail -f orders-service/storage/logs/laravel.log</div>
-
-        <h2 id="production">🚀 Production Deployment</h2>
-
-        <h3>Environment Configuration</h3>
-        <div class="code"># Set production environment
-APP_ENV=production
-APP_DEBUG=false
-
-# Use strong JWT secret
-JWT_SECRET=your-super-secure-jwt-secret-key-here
-
-# Configure database
-DB_CONNECTION=mysql
+# JWT
+JWT_SECRET=your-secret-key-change-this-in-production</code></pre>
+                
+                <h2>Production Configuration</h2>
+                
+                <h3>For Production Deployment</h3>
+                <ol>
+                    <li><strong>Set APP_ENV to production</strong>:
+                        <pre><code>APP_ENV=production
+APP_DEBUG=false</code></pre>
+                    </li>
+                    <li><strong>Use production URLs</strong>:
+                        <pre><code>GATEWAY_URL=https://api.yourdomain.com
+USERS_SERVICE_URL=https://users.yourdomain.com
+ORDERS_SERVICE_URL=https://orders.yourdomain.com</code></pre>
+                    </li>
+                    <li><strong>Use strong JWT secret</strong>:
+                        <pre><code>JWT_SECRET=your-very-strong-random-secret-key-here</code></pre>
+                    </li>
+                    <li><strong>Configure database</strong>:
+                        <pre><code>DB_CONNECTION=mysql
 DB_HOST=your-db-host
 DB_DATABASE=your-database
 DB_USERNAME=your-username
-DB_PASSWORD=your-password</div>
+DB_PASSWORD=your-password</code></pre>
+                    </li>
+                    <li><strong>Set gateway mode to introspect</strong>:
+                        <pre><code>GATEWAY_MODE=introspect</code></pre>
+                    </li>
+                </ol>
+                
+                <h2>Configuration Priority</h2>
+                <p>The system uses the following priority order:</p>
+                <ol>
+                    <li>Environment variables (<code>.env</code> file)</li>
+                    <li>Configuration files (<code>config/*.php</code>)</li>
+                    <li>Default values (fallback)</li>
+                </ol>
+                
+                <h2>Service Discovery</h2>
+                <p>All service URLs are configured in:</p>
+                <ul>
+                    <li><code>gateway-service/config/services.php</code> - Uses env variables</li>
+                    <li>Individual service <code>.env</code> files - Service-specific configuration</li>
+                </ul>
+                
+                <h2>Testing with Custom URLs</h2>
+                <p>Update <code>test.php</code> will automatically read from environment files:</p>
+                <pre><code># Set environment variables
+export GATEWAY_URL=http://192.168.1.100:8000
+export USERS_SERVICE_URL=http://192.168.1.100:8001
+export ORDERS_SERVICE_URL=http://192.168.1.100:8002
 
-        <h3>Security Checklist</h3>
-        <ul>
-            <li>✅ Change default JWT secrets</li>
-            <li>✅ Use HTTPS in production</li>
-            <li>✅ Implement rate limiting</li>
-            <li>✅ Add request logging and monitoring</li>
-            <li>✅ Use production-grade databases</li>
-            <li>✅ Implement database backups</li>
-            <li>✅ Add health checks and monitoring</li>
-        </ul>
+# Or update local_env files directly</code></pre>
+                
+                <h2>Docker/Container Configuration</h2>
+                <p>For containerized deployments, set environment variables:</p>
+                <pre><code># docker-compose.yml example
+services:
+  gateway:
+    environment:
+      - GATEWAY_URL=http://gateway:8000
+      - USERS_SERVICE_URL=http://users:8001
+      - ORDERS_SERVICE_URL=http://orders:8002</code></pre>
+                
+                <h2>Network Configuration</h2>
+                
+                <h3>Local Development</h3>
+                <pre><code>GATEWAY_URL=http://localhost:8000
+USERS_SERVICE_URL=http://localhost:8001
+ORDERS_SERVICE_URL=http://localhost:8002</code></pre>
+                
+                <h3>LAN Access</h3>
+                <pre><code>GATEWAY_URL=http://192.168.1.100:8000
+USERS_SERVICE_URL=http://192.168.1.100:8001
+ORDERS_SERVICE_URL=http://192.168.1.100:8002</code></pre>
+                
+                <h3>Production</h3>
+                <pre><code>GATEWAY_URL=https://api.example.com
+USERS_SERVICE_URL=https://users.example.com
+ORDERS_SERVICE_URL=https://orders.example.com</code></pre>
+                
+                <h2>Timeout Configuration</h2>
+                <p>Configure timeouts for production:</p>
+                <pre><code># Gateway timeout for introspection
+GATEWAY_TIMEOUT=3.0
 
-        <h3>Performance Optimization</h3>
-        <ul>
-            <li>Implement caching (Redis)</li>
-            <li>Add database indexing</li>
-            <li>Optimize database queries</li>
-            <li>Implement API response caching</li>
-            <li>Use load balancing</li>
-        </ul>
+# Proxy timeout for forwarding requests
+GATEWAY_PROXY_TIMEOUT=30
 
-        <h3>Docker Deployment</h3>
-        <div class="code"># Example Dockerfile for each service
-FROM php:8.2-fpm
-RUN docker-php-ext-install pdo pdo_mysql
-COPY . /var/www/html
-WORKDIR /var/www/html
-RUN composer install --no-dev --optimize-autoloader
-EXPOSE 8000</div>
+# Connection timeout
+GATEWAY_CONNECT_TIMEOUT=5</code></pre>
+                
+                <h2>Security Notes</h2>
+                <ol>
+                    <li><strong>Never commit <code>.env</code> files</strong> - They contain sensitive information</li>
+                    <li><strong>Use different JWT secrets</strong> in production</li>
+                    <li><strong>Set APP_DEBUG=false</strong> in production</li>
+                    <li><strong>Use HTTPS</strong> in production</li>
+                    <li><strong>Set strong passwords</strong> for database connections</li>
+                </ol>
+                
+                <h2>Verification</h2>
+                <p>Check your configuration:</p>
+                <pre><code># Gateway service
+cd gateway-service
+php artisan gateway:services
 
-        <div class="info">
-            <strong>📞 Support:</strong> For additional help, check the Laravel documentation or create an issue in the project repository.
+# Test connectivity
+php test.php</code></pre>
+                
+                <h2>Troubleshooting</h2>
+                
+                <h3>Service Not Found</h3>
+                <ul>
+                    <li>Check that service URL is set in <code>.env</code></li>
+                    <li>Verify service is running on configured port</li>
+                    <li>Check firewall/network settings</li>
+                </ul>
+                
+                <h3>Connection Timeout</h3>
+                <ul>
+                    <li>Increase <code>GATEWAY_PROXY_TIMEOUT</code></li>
+                    <li>Check network connectivity</li>
+                    <li>Verify service URLs are correct</li>
+                </ul>
+                
+                <h3>Configuration Not Loading</h3>
+                <ul>
+                    <li>Clear config cache: <code>php artisan config:clear</code></li>
+                    <li>Restart services after changing <code>.env</code></li>
+                    <li>Check file permissions on <code>.env</code> files</li>
+                </ul>
+            </section>
+            
+            <!-- Adding Services Section -->
+            <section id="services">
+                <h1>Adding New Microservices</h1>
+                
+                <p>This guide explains how to easily add new microservices to your gateway without modifying code.</p>
+                
+                <h2>Quick Start: Adding a New Service</h2>
+                <p>To add a new microservice, simply edit <code>config/services.php</code> and add a new entry to the <code>microservices</code> array.</p>
+                
+                <h3>Example: Adding a "Products" Service</h3>
+                <pre><code>// In gateway-service/config/services.php
+
+'products' => [
+    'url' => env('PRODUCTS_SERVICE_URL', 'http://localhost:8003'),
+    'health_endpoint' => '/api/health',
+    'description' => 'Product catalog service',
+    'routes' => [
+        // Public routes
+        [
+            'path' => 'products',
+            'service_path' => 'api/products',
+            'methods' => ['GET'],
+            'middleware' => [],
+        ],
+        [
+            'path' => 'products/{id}',
+            'service_path' => 'api/products/{id}',
+            'methods' => ['GET'],
+            'middleware' => [],
+        ],
+        // Authenticated routes
+        [
+            'path' => 'products',
+            'service_path' => 'api/products',
+            'methods' => ['POST'],
+            'middleware' => ['gateway.auth'],
+        ],
+        [
+            'path' => 'products/{id}',
+            'service_path' => 'api/products/{id}',
+            'methods' => ['PUT', 'DELETE'],
+            'middleware' => ['gateway.auth'],
+        ],
+        // Admin routes
+        [
+            'path' => 'products/admin/all',
+            'service_path' => 'api/admin/products',
+            'methods' => ['GET'],
+            'middleware' => ['gateway.auth', 'require.role:admin,superadmin'],
+        ],
+    ],
+],</code></pre>
+                
+                <h2>Step-by-Step Instructions</h2>
+                <ol>
+                    <li><strong>Add Service Configuration</strong>
+                        <ul>
+                            <li>Open <code>gateway-service/config/services.php</code></li>
+                            <li>Add a new entry to the <code>microservices</code> array</li>
+                            <li>Set the service URL (use environment variable for flexibility)</li>
+                            <li>Define routes for your service</li>
+                        </ul>
+                    </li>
+                    <li><strong>Set Environment Variable</strong>
+                        <ul>
+                            <li>Add to <code>gateway-service/.env</code>:
+                                <pre><code>PRODUCTS_SERVICE_URL=http://localhost:8003</code></pre>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><strong>That's it!</strong> The gateway will automatically:
+                        <ul>
+                            <li>Register all routes</li>
+                            <li>Handle request routing</li>
+                            <li>Include the service in health checks</li>
+                            <li>Support the catch-all dynamic routing</li>
+                        </ul>
+                    </li>
+                </ol>
+                
+                <h2>Route Configuration</h2>
+                <p>Each route in the <code>routes</code> array supports:</p>
+                <ul>
+                    <li><strong>path</strong>: Gateway path pattern (e.g., <code>products/{id}</code>)</li>
+                    <li><strong>service_path</strong>: Path on the target service (e.g., <code>api/products/{id}</code>)</li>
+                    <li><strong>methods</strong>: Array of HTTP methods (e.g., <code>['GET', 'POST']</code>)</li>
+                    <li><strong>middleware</strong>: Array of middleware to apply (e.g., <code>['gateway.auth']</code>)</li>
+                </ul>
+                
+                <h3>Available Middleware</h3>
+                <ul>
+                    <li><code>gateway.auth</code> - Requires JWT authentication</li>
+                    <li><code>require.role:admin,superadmin</code> - Requires specific roles (comma-separated)</li>
+                </ul>
+                
+                <h3>Route Parameters</h3>
+                <p>Route parameters are automatically forwarded. For example:</p>
+                <ul>
+                    <li>Gateway: <code>products/{id}</code> → Service: <code>api/products/{id}</code></li>
+                    <li>Request to <code>/api/products/123</code> will forward to service's <code>/api/products/123</code></li>
+                </ul>
+                
+                <h2>Service Registry API</h2>
+                <p>You can also programmatically interact with services:</p>
+                <pre><code>use App\Services\ServiceRegistry;
+
+// Get all services
+$services = ServiceRegistry::all();
+
+// Get a specific service
+$service = ServiceRegistry::get('products');
+
+// Get service URL
+$url = ServiceRegistry::getUrl('products');
+
+// Check if service exists
+if (ServiceRegistry::exists('products')) {
+    // Service is registered
+}
+
+// Get service routes
+$routes = ServiceRegistry::getRoutes('products');</code></pre>
+                
+                <h2>Dynamic Service Registration</h2>
+                <p>You can also register services at runtime:</p>
+                <pre><code>use App\Services\ServiceRegistry;
+
+ServiceRegistry::register('new-service', [
+    'url' => 'http://localhost:8004',
+    'health_endpoint' => '/api/health',
+    'description' => 'New service',
+    'routes' => [...]
+]);</code></pre>
+                
+                <h2>Health Checks</h2>
+                <p>All services are automatically included in the gateway health check endpoint:</p>
+                <pre><code>GET /api/health</code></pre>
+                <p>Response includes status for all registered services:</p>
+                <pre><code>{
+    "gateway": "up",
+    "services": {
+        "users": {
+            "status": "up",
+            "response_time": 0.023,
+            "url": "http://localhost:8001",
+            "description": "User management service"
+        },
+        "orders": {
+            "status": "up",
+            "response_time": 0.015,
+            "url": "http://localhost:8002",
+            "description": "Order management service"
+        },
+        "products": {
+            "status": "up",
+            "response_time": 0.018,
+            "url": "http://localhost:8003",
+            "description": "Product catalog service"
+        }
+    },
+    "timestamp": "2025-01-15T10:30:00Z",
+    "total_services": 3
+}</code></pre>
+                
+                <h2>Best Practices</h2>
+                <ol>
+                    <li><strong>Use Environment Variables</strong>: Always use env vars for service URLs
+                        <pre><code>'url' => env('PRODUCTS_SERVICE_URL', 'http://localhost:8003'),</code></pre>
+                    </li>
+                    <li><strong>Group Routes by Middleware</strong>: Routes with the same middleware are automatically grouped for efficiency</li>
+                    <li><strong>Use Descriptive Paths</strong>: Make gateway paths intuitive and RESTful</li>
+                    <li><strong>Document Your Service</strong>: Add a description to help with debugging</li>
+                    <li><strong>Health Endpoints</strong>: Ensure your service has a health check endpoint</li>
+                </ol>
+                
+                <h2>Troubleshooting</h2>
+                
+                <h3>Service Not Found (404)</h3>
+                <ul>
+                    <li>Check that the service is registered in <code>config/services.php</code></li>
+                    <li>Verify the service name matches exactly</li>
+                </ul>
+                
+                <h3>Service URL Not Configured (500)</h3>
+                <ul>
+                    <li>Ensure the service URL is set in <code>.env</code></li>
+                    <li>Check that the URL is accessible</li>
+                </ul>
+                
+                <h3>Routes Not Working</h3>
+                <ul>
+                    <li>Verify route paths match your service endpoints</li>
+                    <li>Check middleware configuration</li>
+                    <li>Ensure HTTP methods are correct</li>
+                </ul>
+                
+                <h3>Health Check Failing</h3>
+                <ul>
+                    <li>Verify the service is running</li>
+                    <li>Check the health endpoint path</li>
+                    <li>Ensure the service URL is correct</li>
+                </ul>
+            </section>
         </div>
-
-        <hr style="margin: 40px 0;">
-        <p style="text-align: center; color: #7f8c8d;">
-            <strong>Laravel 12 JWT Microservices Starter</strong><br>
-            ✅ Fully Functional • JWT Authentication • Role-Based Access Control • JSON & Form-Data Support<br>
-            Built with Laravel 12 • Firebase JWT • API Gateway • Microservices Architecture
-        </p>
+        
+        <footer>
+            <p>&copy; 2025 Laravel 12 JWT Microservices Starter. All rights reserved.</p>
+            <p>Complete documentation for microservices architecture, configuration, and service management.</p>
+        </footer>
     </div>
 </body>
 </html>

@@ -52,7 +52,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost'),
+    'url' => env('APP_URL', env('GATEWAY_URL', 'http://localhost:8000')),
 
     /*
     |--------------------------------------------------------------------------
@@ -122,5 +122,21 @@ return [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Gateway Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the API Gateway service
+    |
+    */
+
+    'gateway_mode' => env('GATEWAY_MODE', 'introspect'),
+    'gateway_bypass_role' => env('GATEWAY_BYPASS_ROLE', 'admin'),
+    'gateway_bypass_email' => env('GATEWAY_BYPASS_EMAIL', 'dev@example.com'),
+    'gateway_timeout' => env('GATEWAY_TIMEOUT', 3.0),
+    'gateway_proxy_timeout' => env('GATEWAY_PROXY_TIMEOUT', 30),
+    'gateway_connect_timeout' => env('GATEWAY_CONNECT_TIMEOUT', 5),
 
 ];

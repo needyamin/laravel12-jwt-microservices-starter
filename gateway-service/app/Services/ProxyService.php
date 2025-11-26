@@ -7,6 +7,22 @@ use Illuminate\Support\Facades\Log;
 
 class ProxyService
 {
+    /**
+     * Get timeout from config or environment
+     */
+    protected function getTimeout(): float
+    {
+        return (float) config('app.gateway_proxy_timeout', env('GATEWAY_PROXY_TIMEOUT', 30));
+    }
+
+    /**
+     * Get connect timeout from config or environment
+     */
+    protected function getConnectTimeout(): float
+    {
+        return (float) config('app.gateway_connect_timeout', env('GATEWAY_CONNECT_TIMEOUT', 5));
+    }
+
     public function forward(Request $request, string $baseUrl, string $path = '')
     {
         $fullPath = $path ? '/' . ltrim($path, '/') : '';
@@ -24,7 +40,8 @@ class ProxyService
 
         $options = [
             'headers' => $forwardHeaders,
-            'timeout' => 30,
+            'timeout' => $this->getTimeout(),
+            'connect_timeout' => $this->getConnectTimeout(),
         ];
 
         if (in_array(strtoupper($request->method()), ['POST','PUT','PATCH'])) {
@@ -46,11 +63,42 @@ class ProxyService
 
         try {
             $response = Http::withOptions($options)->$method($url);
+            
+            // Log slow requests in production
+            if (config('app.env') === 'production') {
+                $responseTime = $response->transferStats?->getHandlerStat('total_time') ?? 0;
+                if ($responseTime > 2.0) {
+                    Log::warning('Slow proxy request', [
+                        'url' => $url,
+                        'method' => $method,
+                        'response_time' => $responseTime
+                    ]);
+                }
+            }
+            
             return response($response->body(), $response->status())
                 ->withHeaders($response->headers());
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error('Proxy connection error', [
+                'url' => $url,
+                'method' => $method,
+                'error' => $e->getMessage()
+            ]);
+            return response()->json([
+                'error' => 'Service temporarily unavailable',
+                'message' => 'Unable to connect to service'
+            ], 503);
         } catch (\Exception $e) {
-            Log::error('Proxy forward error: '.$e->getMessage());
-            return response()->json(['error' => 'Service temporarily unavailable'], 503);
+            Log::error('Proxy forward error', [
+                'url' => $url,
+                'method' => $method,
+                'error' => $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTraceAsString() : null
+            ]);
+            return response()->json([
+                'error' => 'Service temporarily unavailable',
+                'message' => config('app.debug') ? $e->getMessage() : 'An error occurred while processing your request'
+            ], 503);
         }
     }
 }

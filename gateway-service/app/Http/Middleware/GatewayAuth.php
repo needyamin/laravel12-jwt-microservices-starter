@@ -8,13 +8,13 @@ class GatewayAuth
 {
     public function handle($request, Closure $next)
     {
-        $mode = env('GATEWAY_MODE', 'introspect');
+        $mode = config('app.gateway_mode', env('GATEWAY_MODE', 'introspect'));
 
         if ($mode === 'bypass') {
             // In bypass mode, we'll let the downstream service handle user creation/lookup
             // by not setting X-User-Id, and let TrustGateway middleware handle it
-            $request->headers->set('X-User-Email', 'dev@example.com');
-            $request->headers->set('X-User-Role', env('GATEWAY_BYPASS_ROLE', 'user'));
+            $request->headers->set('X-User-Email', config('app.gateway_bypass_email', env('GATEWAY_BYPASS_EMAIL', 'dev@example.com')));
+            $request->headers->set('X-User-Role', config('app.gateway_bypass_role', env('GATEWAY_BYPASS_ROLE', 'user')));
             $request->headers->set('X-Bypass-Mode', 'true');
             return $next($request);
         }
@@ -25,7 +25,9 @@ class GatewayAuth
         }
 
         $token = $matches[1];
-        $client = new Client(['base_uri' => env('AUTH_SERVICE_URL', 'http://127.0.0.1:8001'), 'timeout' => 3.0]);
+        $authServiceUrl = config('services.microservices.users.url', env('AUTH_SERVICE_URL', env('USERS_SERVICE_URL', 'http://127.0.0.1:8001')));
+        $timeout = config('app.gateway_timeout', env('GATEWAY_TIMEOUT', 3.0));
+        $client = new Client(['base_uri' => $authServiceUrl, 'timeout' => (float) $timeout]);
 
         try {
             $res = $client->post('/api/introspect', ['json' => ['token' => $token]]);
