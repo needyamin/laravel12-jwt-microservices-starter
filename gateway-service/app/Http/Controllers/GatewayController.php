@@ -7,10 +7,14 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use App\Services\ProxyService;
 use App\Services\ServiceRegistry;
+use App\Services\KafkaService;
 
 class GatewayController extends Controller
 {
-    public function __construct(private ProxyService $proxy) {}
+    public function __construct(
+        private ProxyService $proxy,
+        private KafkaService $kafka
+    ) {}
 
     /**
      * Route requests to appropriate microservices
@@ -46,15 +50,17 @@ class GatewayController extends Controller
 
     /**
      * Health check endpoint
+     * 
+     * Uses Kafka heartbeat events if available, falls back to HTTP calls
      */
     public function health()
     {
         $services = [];
         $allServices = ServiceRegistry::all();
+        $useKafka = $this->kafka->isAvailable();
         
         foreach ($allServices as $name => $config) {
             $url = $config['url'] ?? null;
-            $healthEndpoint = ServiceRegistry::getHealthEndpoint($name);
             
             if (!$url) {
                 $services[$name] = [
@@ -64,7 +70,17 @@ class GatewayController extends Controller
                 continue;
             }
 
+            // Try Kafka heartbeat first (if enabled)
+            if ($useKafka) {
+                // Check for recent heartbeat in Kafka
+                // In a real implementation, you'd query Kafka for recent heartbeats
+                // For now, we'll fall through to HTTP check
+                // TODO: Implement Kafka heartbeat consumption
+            }
+
+            // Fallback to HTTP health check
             try {
+                $healthEndpoint = ServiceRegistry::getHealthEndpoint($name);
                 $healthUrl = rtrim($url, '/') . '/' . ltrim($healthEndpoint, '/');
                 $timeout = $config['timeout'] ?? config('app.gateway_timeout', 5);
                 $response = Http::timeout((float) $timeout)->get($healthUrl);
@@ -73,7 +89,8 @@ class GatewayController extends Controller
                     'status' => $response->successful() ? 'up' : 'down',
                     'response_time' => $response->transferStats?->getHandlerStat('total_time') ?? 0,
                     'url' => $url,
-                    'description' => $config['description'] ?? null
+                    'description' => $config['description'] ?? null,
+                    'check_method' => 'http' // Indicates we used HTTP fallback
                 ];
             } catch (\Exception $e) {
                 Log::warning('Health check failed', [
@@ -85,7 +102,8 @@ class GatewayController extends Controller
                 $services[$name] = [
                     'status' => 'down',
                     'error' => config('app.debug') ? $e->getMessage() : 'Service unavailable',
-                    'url' => $url
+                    'url' => $url,
+                    'check_method' => 'http'
                 ];
             }
         }
@@ -94,7 +112,8 @@ class GatewayController extends Controller
             'gateway' => 'up',
             'services' => $services,
             'timestamp' => now()->toIso8601String(),
-            'total_services' => count($allServices)
+            'total_services' => count($allServices),
+            'kafka_enabled' => $useKafka
         ]);
     }
 }

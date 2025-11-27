@@ -8,8 +8,9 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-DOCKER_COMPOSE_FILE="docker-compose.yml"
-K8S_DIR="k8s"
+DOCKER_DIR="docker"
+DOCKER_COMPOSE_FILE="docker/docker-compose.yml"
+K8S_DIR="docker/k8s"
 HOSTS_FILE="/etc/hosts"
 LOCAL_IP="127.0.0.1"
 
@@ -87,9 +88,9 @@ setup_docker() {
     echo ""
     
     # Create .env file if it doesn't exist
-    if [ ! -f .env ]; then
+    if [ ! -f $DOCKER_DIR/.env ]; then
         echo -e "${YELLOW}Creating .env file...${NC}"
-        cat > .env << EOF
+        cat > $DOCKER_DIR/.env << EOF
 # Application Environment
 APP_ENV=production
 APP_DEBUG=false
@@ -115,7 +116,7 @@ EOF
     
     # Build images
     echo -e "${YELLOW}Building Docker images...${NC}"
-    docker-compose build
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . --env-file $DOCKER_DIR/.env build
     
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to build Docker images${NC}"
@@ -126,7 +127,7 @@ EOF
     
     # Start services
     echo -e "${YELLOW}Starting services...${NC}"
-    docker-compose up -d
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . --env-file $DOCKER_DIR/.env up -d
     
     if [ $? -ne 0 ]; then
         echo -e "${RED}Failed to start services${NC}"
@@ -141,16 +142,16 @@ EOF
     
     # Run migrations
     echo -e "${YELLOW}Running database migrations...${NC}"
-    docker-compose exec -T gateway php artisan migrate --force || true
-    docker-compose exec -T users php artisan migrate --force || true
-    docker-compose exec -T orders php artisan migrate --force || true
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . exec -T gateway php artisan migrate --force || true
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . exec -T users php artisan migrate --force || true
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . exec -T orders php artisan migrate --force || true
     
     echo -e "${GREEN}✓ Migrations completed${NC}"
     
     # Show service status
     echo ""
     echo -e "${BLUE}Service Status:${NC}"
-    docker-compose ps
+    docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . ps
     
     echo ""
     echo -e "${GREEN}✓ Docker Compose setup completed!${NC}"
@@ -293,6 +294,9 @@ show_service_urls() {
         echo -e "  Orders:   http://localhost:8002"
         echo -e "  MySQL:    localhost:3306"
         echo -e "  Redis:    localhost:6379"
+        echo -e "  Kafka:    localhost:9092"
+        echo -e "  Kafka UI: http://localhost:8081"
+        echo -e "  phpMyAdmin: http://localhost:8080"
         echo ""
     fi
     
@@ -353,7 +357,7 @@ echo "2. Wait a few minutes for all services to be fully ready"
 echo "3. Test the health endpoint: curl http://localhost:8000/api/health"
 echo "4. Check service logs if needed:"
 if [ "$DEPLOY_METHOD" = "docker" ] || [ "$DEPLOY_METHOD" = "both" ]; then
-    echo "   - docker-compose logs -f"
+    echo "   - docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . logs -f"
 fi
 if [ "$DEPLOY_METHOD" = "k8s" ] || [ "$DEPLOY_METHOD" = "both" ]; then
     echo "   - kubectl logs -n microservices -l app=gateway -f"

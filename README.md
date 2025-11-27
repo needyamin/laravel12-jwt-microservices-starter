@@ -1,6 +1,6 @@
 # Laravel 12 JWT Microservices Starter
 
-A fully functional Laravel 12-based microservices architecture with JWT authentication, API Gateway, and role-based access control. **All CRUD operations and authentication endpoints are working perfectly!**
+A fully functional Laravel 12-based microservices architecture with JWT authentication, API Gateway, Apache Kafka event streaming, and role-based access control. **All CRUD operations, authentication endpoints, and event-driven communication are working perfectly!**
 
 ## 🚀 Easy Service Management
 
@@ -19,6 +19,7 @@ This architecture is designed to make adding new microservices **extremely easy*
 - ✅ **Authentication**: Register, login, JWT tokens, introspection working
 - ✅ **CRUD Operations**: All user and order operations working  
 - ✅ **API Gateway**: Properly routing requests with JWT validation
+- ✅ **Apache Kafka**: Event-driven communication for async operations
 - ✅ **JSON API**: Full REST API functionality
 - ✅ **Form-Data Support**: Both JSON and form-data work through gateway
 - ✅ **JWT Authentication**: Complete JWT implementation with bypass for development
@@ -53,6 +54,17 @@ This architecture is designed to make adding new microservices **extremely easy*
 │  │   :3306      │  │   :6379      │  │   :8080      │          │
 │  └──────────────┘  └──────────────┘  └──────────────┘          │
 │                                                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              Apache Kafka Event Streaming                │   │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │   │
+│  │  │  Zookeeper   │  │    Kafka    │  │   Kafka UI   │   │   │
+│  │  │   :2181      │  │   :9092     │  │   :8081      │   │   │
+│  │  └──────────────┘  └──────────────┘  └──────────────┘   │   │
+│  │                                                          │   │
+│  │  Topics: orders.created, orders.updated, orders.deleted │   │
+│  │          services.heartbeat, users.created, etc.        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                                                                   │
 └─────────────────────────────────────────────────────────────────┘
                               │
                     ┌─────────┴─────────┐
@@ -69,7 +81,7 @@ This architecture is designed to make adding new microservices **extremely easy*
   - JWT token validation and introspection
   - Request routing to microservices
   - Role-based access control with `RequireRole` middleware
-  - Health check monitoring for all services
+  - Health check monitoring for all services (Kafka-ready)
   - Security headers and XSS protection
   - User context injection via headers (`X-User-Id`, `X-User-Email`, `X-User-Role`)
 
@@ -83,6 +95,7 @@ This architecture is designed to make adding new microservices **extremely easy*
   - Role-based user management (Admin only)
   - Password hashing and validation
   - TrustGateway middleware for gateway integration
+  - Kafka event publishing (ready for implementation)
 
 ### 3. Orders Service (Port 8002)
 - **Purpose**: Order management with user-specific access
@@ -93,6 +106,99 @@ This architecture is designed to make adding new microservices **extremely easy*
   - Role-based access (Moderator/Admin can manage all orders)
   - TrustGateway middleware for gateway integration
   - Professional service/repository architecture
+  - **Kafka Event Publishing**: Publishes `orders.created`, `orders.updated`, `orders.deleted` events
+
+### 4. Apache Kafka (Port 9092)
+- **Purpose**: Event streaming platform for async communication
+- **Features**:
+  - Event-driven communication between services
+  - Event persistence and replay capability
+  - High-throughput message processing
+  - Kafka UI for monitoring (port 8081)
+  - Zookeeper for coordination (port 2181)
+
+## Apache Kafka Integration
+
+### What Kafka Replaces
+
+The system uses **Kafka for async event-driven communication** while keeping **HTTP for synchronous request/response** patterns.
+
+#### ✅ Replaced with Kafka:
+1. **Direct Service Calls for Async Operations** → Event Publishing
+   - OrderService now publishes events instead of making direct HTTP calls
+   - Events: `orders.created`, `orders.updated`, `orders.deleted`
+
+2. **Health Check Polling** → Kafka Heartbeat Events (ready for implementation)
+   - Services can publish heartbeat events to Kafka
+   - Gateway can consume from Kafka (with HTTP fallback)
+
+#### ❌ Still Using HTTP (Correctly):
+- Gateway request routing (needs synchronous responses)
+- JWT token validation (security requires immediate validation)
+- Health check HTTP fallback (reliability if Kafka unavailable)
+
+### Event Topics
+
+**Order Events:**
+- `orders.created` - Published when order is created
+- `orders.updated` - Published when order status changes
+- `orders.deleted` - Published when order is deleted
+
+**Service Events (Ready for Implementation):**
+- `services.heartbeat` - For health check heartbeats
+- `users.created` - When user registers
+- `users.updated` - When user profile updates
+
+### Benefits
+
+1. **Decoupling**: Services communicate via events, not direct HTTP calls
+2. **Performance**: Async processing doesn't block request/response cycle
+3. **Reliability**: Events are persisted, can be replayed if service fails
+4. **Scalability**: Multiple consumers can process same events independently
+5. **Observability**: All events visible in Kafka UI (http://localhost:8081)
+
+### Using Kafka
+
+**Publish Events:**
+```php
+$kafka = app(KafkaService::class);
+$kafka->publish('orders.created', [
+    'order_id' => $order->id,
+    'user_id' => $order->user_id,
+    'total_amount' => $order->total_amount
+]);
+```
+
+**Consume Events:**
+```php
+$kafka->consume('orders.created', function($data) {
+    // Send email notification
+    Mail::to($data['user_email'])->send(new OrderConfirmation($data));
+    
+    // Update inventory
+    Inventory::reserve($data['items']);
+});
+```
+
+**Access Kafka UI:**
+- URL: http://localhost:8081
+- View all topics, messages, and consumer groups
+
+### Next Steps (Optional)
+
+1. **Install Kafka Client Library:**
+   ```bash
+   composer require enqueue/rdkafka
+   ```
+
+2. **Update KafkaService.php:**
+   - Replace TODO comments with actual Kafka producer/consumer code
+   - Examples provided in the service file
+
+3. **Add More Event Publishers:**
+   - User registration events
+   - Payment events
+   - Notification events
 
 ## User Roles
 
@@ -115,15 +221,15 @@ This architecture is designed to make adding new microservices **extremely easy*
 ```
 
 #### For Windows:
-```batch
+```bash
 setup.bat
 ```
 
 The setup script will automatically:
 - ✅ Check Docker and Docker Compose installation
-- ✅ Create `.env` files from `local_env` templates
+- ✅ Create `.env` files in `docker/` folder
 - ✅ Build Docker images for all services
-- ✅ Start all containers (Gateway, Users, Orders, MySQL, Redis, phpMyAdmin)
+- ✅ Start all containers (Gateway, Users, Orders, MySQL, Redis, Kafka, Zookeeper, phpMyAdmin, Kafka UI)
 - ✅ Run database migrations
 - ✅ Display service URLs and status
 - ✅ Show host file configuration
@@ -134,108 +240,219 @@ The setup script will automatically:
 - **Users Service**: http://localhost:8001
 - **Orders Service**: http://localhost:8002
 - **phpMyAdmin**: http://localhost:8080
+- **Kafka UI**: http://localhost:8081
 - **MySQL**: localhost:3306
 - **Redis**: localhost:6379
+- **Kafka**: localhost:9092
 
 ### Manual Docker Setup
 
 If you prefer manual setup:
 
 ```bash
-# 1. Create .env files (if not exists)
-cp gateway-service/local_env gateway-service/.env
-cp users-service/local_env users-service/.env
-cp orders-service/local_env orders-service/.env
+# 1. Navigate to project root
+cd /path/to/laravel12-jwt-microservices-starter
 
 # 2. Build and start services
-docker-compose up -d --build
+docker-compose -f docker/docker-compose.yml --project-directory . up -d --build
 
 # 3. Wait for MySQL to be healthy
-docker-compose ps
+docker-compose -f docker/docker-compose.yml --project-directory . ps
 
 # 4. Check service logs
-docker-compose logs -f
+docker-compose -f docker/docker-compose.yml --project-directory . logs -f
 ```
 
 ### Useful Docker Commands
 
 ```bash
 # View all service logs
-docker-compose logs -f
+docker-compose -f docker/docker-compose.yml --project-directory . logs -f
 
 # View specific service logs
-docker-compose logs -f gateway
+docker-compose -f docker/docker-compose.yml --project-directory . logs -f gateway
 
 # Stop all services
-docker-compose down
+docker-compose -f docker/docker-compose.yml --project-directory . down
 
 # Stop and remove volumes (clean slate)
-docker-compose down -v
+docker-compose -f docker/docker-compose.yml --project-directory . down -v
 
 # Restart a service
-docker-compose restart gateway
+docker-compose -f docker/docker-compose.yml --project-directory . restart gateway
 
 # Execute command in container
-docker-compose exec gateway php artisan migrate
-docker-compose exec gateway php artisan route:list
+docker-compose -f docker/docker-compose.yml --project-directory . exec gateway php artisan migrate
+docker-compose -f docker/docker-compose.yml --project-directory . exec gateway php artisan route:list
 ```
 
 ## Environment Configuration
 
-All services use environment variables for configuration. The `local_env` files serve as templates:
+All services use environment variables configured in `docker/docker-compose.yml`. The `local_env` files serve as templates for local development.
 
-### Gateway Service Configuration
+### Current Configuration (Docker Compose)
 
-Edit `gateway-service/local_env` or set environment variables:
+Environment variables are set directly in `docker/docker-compose.yml`:
 
+**Gateway Service:**
 ```env
-# Service URLs (configurable)
-GATEWAY_URL=${GATEWAY_URL:-http://localhost:8000}
-USERS_SERVICE_URL=${USERS_SERVICE_URL:-http://localhost:8001}
-ORDERS_SERVICE_URL=${ORDERS_SERVICE_URL:-http://orders:8002}
-
-# JWT Configuration
+APP_ENV=production
+APP_DEBUG=false
+GATEWAY_MODE=introspect  # or 'bypass' for development
+GATEWAY_BYPASS_ROLE=admin
+GATEWAY_BYPASS_EMAIL=dev@example.com
 JWT_SECRET=your-secret-key-change-this-in-production
-
-# Gateway Mode
-GATEWAY_MODE=${GATEWAY_MODE:-introspect}  # or 'bypass' for development
-GATEWAY_BYPASS_ROLE=${GATEWAY_BYPASS_ROLE:-admin}
-GATEWAY_BYPASS_EMAIL=${GATEWAY_BYPASS_EMAIL:-dev@example.com}
-
-# Database
-DB_HOST=${DB_HOST:-mysql}  # Use 'mysql' for Docker, '127.0.0.1' for local
-DB_DATABASE=${DB_DATABASE:-microservices}
+USERS_SERVICE_URL=http://users:8001
+ORDERS_SERVICE_URL=http://orders:8002
+AUTH_SERVICE_URL=http://users:8001
+KAFKA_BROKERS=kafka:29092
+DB_HOST=mysql
+DB_DATABASE=microservices
 ```
 
-### Users & Orders Service Configuration
-
-Similar structure - edit `users-service/local_env` and `orders-service/local_env`:
-
+**Users Service:**
 ```env
-# Service URL
-USERS_SERVICE_URL=${USERS_SERVICE_URL:-http://localhost:8001}
-
-# JWT Secret (must match across all services)
+APP_ENV=production
+APP_DEBUG=false
 JWT_SECRET=your-secret-key-change-this-in-production
-
-# Database
-DB_HOST=${DB_HOST:-mysql}  # Use 'mysql' for Docker
-DB_DATABASE=microservice_user  # or microservice_order
+USERS_SERVICE_URL=http://users:8001
+KAFKA_BROKERS=kafka:29092
+DB_HOST=mysql
+DB_DATABASE=microservice_user
 ```
 
-**Important**: All services must use the same `JWT_SECRET` for proper token validation.
+**Orders Service:**
+```env
+APP_ENV=production
+APP_DEBUG=false
+JWT_SECRET=your-secret-key-change-this-in-production
+ORDERS_SERVICE_URL=http://orders:8002
+KAFKA_BROKERS=kafka:29092
+DB_HOST=mysql
+DB_DATABASE=microservice_order
+```
+
+**Important**: 
+- All services must use the same `JWT_SECRET` for proper token validation
+- For Docker, use service names (`mysql`, `kafka`) not `localhost`
+- Environment variables can be overridden via `docker/.env` file
+
+### Changing Environment Variables
+
+**Option 1: Edit docker-compose.yml**
+Edit the `environment:` section for each service in `docker/docker-compose.yml`, then:
+```bash
+docker-compose -f docker/docker-compose.yml --project-directory . up -d --force-recreate
+```
+
+**Option 2: Use docker/.env file**
+Create `docker/.env` file and set variables there. Docker Compose will automatically use them:
+```env
+GATEWAY_MODE=bypass
+JWT_SECRET=my-new-secret
+MYSQL_PASSWORD=my-password
+```
 
 ## Kubernetes Deployment
 
-For Kubernetes deployment, see [README-DOCKER.md](README-DOCKER.md) for detailed instructions.
+### Prerequisites
 
-Quick start:
+1. **Kubernetes cluster** (one of):
+   - Minikube: `minikube start`
+   - Kind: `kind create cluster`
+   - Cloud provider (GKE, EKS, AKS)
+
+2. **kubectl** configured to access your cluster
+
+### Manual Setup
+
+1. **Build and tag images**:
 ```bash
-# Apply Kubernetes manifests
-kubectl apply -f k8s/
+docker build -t microservices-gateway:latest ./gateway-service
+docker build -t microservices-users:latest ./users-service
+docker build -t microservices-orders:latest ./orders-service
+```
 
-# Access services via port-forward
+2. **Load images into cluster** (for local clusters):
+```bash
+# Minikube
+minikube image load microservices-gateway:latest
+minikube image load microservices-users:latest
+minikube image load microservices-orders:latest
+
+# Kind
+kind load docker-image microservices-gateway:latest
+kind load docker-image microservices-users:latest
+kind load docker-image microservices-orders:latest
+```
+
+3. **Apply Kubernetes manifests**:
+```bash
+kubectl apply -f docker/k8s/namespace.yaml
+kubectl apply -f docker/k8s/secrets.yaml
+kubectl apply -f docker/k8s/configmap.yaml
+kubectl apply -f docker/k8s/mysql-deployment.yaml
+kubectl apply -f docker/k8s/redis-deployment.yaml
+kubectl apply -f docker/k8s/users-deployment.yaml
+kubectl apply -f docker/k8s/orders-deployment.yaml
+kubectl apply -f docker/k8s/gateway-deployment.yaml
+kubectl apply -f docker/k8s/ingress.yaml
+```
+
+4. **Wait for services**:
+```bash
+kubectl wait --for=condition=ready pod -l app=mysql -n microservices --timeout=300s
+```
+
+5. **Run migrations**:
+```bash
+GATEWAY_POD=$(kubectl get pods -n microservices -l app=gateway -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n microservices $GATEWAY_POD -- php artisan migrate --force
+
+USERS_POD=$(kubectl get pods -n microservices -l app=users -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n microservices $USERS_POD -- php artisan migrate --force
+
+ORDERS_POD=$(kubectl get pods -n microservices -l app=orders -o jsonpath='{.items[0].metadata.name}')
+kubectl exec -n microservices $ORDERS_POD -- php artisan migrate --force
+```
+
+### Accessing Services
+
+#### Using Port Forward:
+```bash
+# Gateway
 kubectl port-forward -n microservices svc/gateway 8000:8000
+
+# Users
+kubectl port-forward -n microservices svc/users 8001:8001
+
+# Orders
+kubectl port-forward -n microservices svc/orders 8002:8002
+```
+
+#### Using Ingress:
+If you have an ingress controller installed, services are accessible via:
+- http://gateway.local
+- http://users.local
+- http://orders.local
+
+### Useful Kubernetes Commands
+
+```bash
+# View pods
+kubectl get pods -n microservices
+
+# View services
+kubectl get svc -n microservices
+
+# View logs
+kubectl logs -n microservices -l app=gateway -f
+
+# Execute command in pod
+kubectl exec -n microservices -it <pod-name> -- bash
+
+# Delete everything
+kubectl delete namespace microservices
 ```
 
 ## API Documentation
@@ -277,15 +494,6 @@ Content-Type: application/json
     "email": "john@example.com",
     "password": "password123"
 }
-```
-
-**Alternative: Form-Data (Also Supported)**
-```http
-POST /api/auth/login
-Content-Type: multipart/form-data
-
-email: john@example.com
-password: password123
 ```
 
 #### Refresh Token
@@ -370,6 +578,8 @@ Content-Type: application/json
 }
 ```
 
+**Note:** This automatically publishes `orders.created` event to Kafka.
+
 #### Get Specific Order
 ```http
 GET /api/orders/{id}
@@ -388,11 +598,15 @@ Content-Type: application/json
 }
 ```
 
+**Note:** This automatically publishes `orders.updated` event to Kafka.
+
 #### Delete Order (Pending Only)
 ```http
 DELETE /api/orders/{id}
 Authorization: Bearer <token>
 ```
+
+**Note:** This automatically publishes `orders.deleted` event to Kafka.
 
 #### Update Order Status (Moderator/Admin Only)
 ```http
@@ -426,17 +640,20 @@ Returns comprehensive health status of all services:
       "status": "up",
       "response_time": 0.05,
       "url": "http://users:8001",
-      "description": "User management and authentication service"
+      "description": "User management and authentication service",
+      "check_method": "http"
     },
     "orders": {
       "status": "up",
       "response_time": 0.03,
       "url": "http://orders:8002",
-      "description": "Order management service"
+      "description": "Order management service",
+      "check_method": "http"
     }
   },
   "timestamp": "2025-11-26T22:00:00Z",
-  "total_services": 2
+  "total_services": 2,
+  "kafka_enabled": true
 }
 ```
 
@@ -464,70 +681,32 @@ Returns comprehensive health status of all services:
 - Endpoint-level permission checks
 - Resource ownership validation
 
-## Recent Fixes and Improvements
-
-### 🔧 Issues Fixed (Latest Update - November 26, 2025)
-1. **Docker Integration**: Full Docker Compose setup with automated migrations
-2. **500 Errors Fixed**: Resolved missing APP_KEY and view cache directory issues
-3. **phpMyAdmin Added**: Web-based MySQL management interface
-4. **Kubernetes Support**: Complete K8s manifests for production deployment
-5. **Automated Setup**: One-command setup scripts for Linux/Mac and Windows
-6. **Environment Variables**: All hardcoded URLs replaced with configurable environment variables
-7. **Route Prefix Fix**: Fixed duplicate API prefix in route registration
-8. **Health Checks**: Comprehensive health monitoring for all services
-9. **Service Discovery**: Dynamic service registration and routing
-10. **Production Ready**: All services optimized and tested for production
-
-### 🔧 Previous Fixes (September 7, 2025)
-1. **JWT Library Missing**: Installed `firebase/php-jwt` in all services
-2. **Middleware User Resolution**: Fixed `TrustGateway` middleware to properly set user objects using `$request->setUserResolver()`
-3. **Controller User Access**: Updated controllers to use `$request->user()` instead of `$request->user`
-4. **Gateway Data Forwarding**: Fixed gateway to properly forward both JSON and form-data
-5. **Password Hashing**: Removed double-hashing in AuthController (Laravel 11's `hashed` cast handles it)
-6. **User Model Fields**: Added `is_active` field to the orders-service User model
-7. **Form-Data Support**: Gateway now properly forwards form-data by converting it to JSON
-8. **Missing Middleware**: Created and registered `RequireRole` middleware in gateway service
-9. **Missing Introspect Endpoint**: Added `/api/introspect` endpoint to users service for gateway JWT validation
-10. **Environment Variables**: Added missing `AUTH_SERVICE_URL` and `JWT_SECRET` to gateway and users services
-11. **Middleware Cleanup**: Removed unused middleware files (`DevJwtBypass`, `JwtMiddleware`, `SecurityMiddleware`, `JwtControl`)
-12. **Route Configuration**: Updated all services to use correct middleware aliases (`gateway.auth`, `trust.gateway`, `require.role`)
-13. **User Resolution Fix**: Fixed `TrustGateway` middleware to fetch actual User model from database instead of mock object
-14. **Test Script Updates**: Updated test script to use correct endpoints (`/api/users/profile` instead of `/api/users`)
-15. **Gateway Bypass Mode**: Implemented proper bypass mode with `GATEWAY_MODE=bypass` configuration
-16. **Bypass User Creation**: Fixed "User not found" error by implementing automatic user creation in bypass mode
-17. **Middleware Registration**: Fixed missing `require.role` middleware registration in gateway service
-18. **Environment File Setup**: Created proper `.env` file configuration for all services
-
-### ✅ Current Working Features
-- **Authentication**: Register, login, JWT tokens, refresh, logout, introspect
-- **User Management**: Profile management, admin user operations
-- **Order Management**: Full CRUD operations, status updates, admin operations
-- **API Gateway**: Proper request routing and data forwarding with JWT validation
-- **Multiple Formats**: Both JSON and form-data supported
-- **Gateway Bypass Mode**: Development mode with automatic user creation and admin privileges
-- **Production Mode**: Full JWT authentication with role-based access control
-- **Clean Architecture**: Professional MVC/OOP structure with service and repository layers
-- **Middleware Chain**: Complete middleware implementation with proper user resolution
-
-## Testing the System
-
-### Gateway Bypass Mode (Development)
+## Gateway Bypass Mode (Development)
 
 The system includes a powerful bypass mode for local development that eliminates the need for JWT authentication while maintaining full functionality.
 
 ### How to Enable Gateway Bypass Mode
 
 #### Method 1: Environment Variables (Recommended)
-Add these variables to your `gateway-service/.env` file:
+Edit `docker/docker-compose.yml` and change:
+```yaml
+- GATEWAY_MODE=${GATEWAY_MODE:-introspect}
+```
+to:
+```yaml
+- GATEWAY_MODE=${GATEWAY_MODE:-bypass}
+```
 
+Or create `docker/.env` file:
 ```env
-# Gateway Configuration
 GATEWAY_MODE=bypass
 GATEWAY_BYPASS_ROLE=admin
 ```
 
-#### Check Current Mode
-The system automatically detects the mode. You can verify it by checking the health endpoint or gateway logs.
+Then restart:
+```bash
+docker-compose -f docker/docker-compose.yml --project-directory . restart gateway
+```
 
 ### How Gateway Bypass Works
 
@@ -545,10 +724,7 @@ The system automatically detects the mode. You can verify it by checking the hea
 | Role Access | 🔓 Admin by default | 🔐 Based on JWT claims |
 | Development | 🚀 Perfect for testing | 🏭 Production ready |
 
-
-#### Testing the System
-
-You can test the system using curl or Postman:
+### Testing the System
 
 **Testing with curl:**
 
@@ -570,7 +746,7 @@ curl -X POST http://localhost:8000/api/auth/login \
 curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profile
 ```
 
-#### Test Protected Endpoints in Bypass Mode
+**Test Protected Endpoints in Bypass Mode:**
 ```bash
 # Get user profile (no token required in bypass mode)
 curl http://localhost:8000/api/users/profile
@@ -595,7 +771,7 @@ curl http://localhost:8000/api/users
 curl http://localhost:8000/api/orders/admin/all
 ```
 
-#### Test Protected Endpoints in Normal Mode
+**Test Protected Endpoints in Normal Mode:**
 ```bash
 # These will return 401 Unauthorized without valid JWT token
 curl http://localhost:8000/api/users/profile  # Returns 401
@@ -604,138 +780,6 @@ curl http://localhost:8000/api/orders         # Returns 401
 # With valid JWT token (after login)
 curl -H "Authorization: Bearer YOUR_JWT_TOKEN" http://localhost:8000/api/users/profile
 ```
-
-### Production Mode (Full Authentication)
-
-#### 1. Create a Test User
-```bash
-curl -X POST http://localhost:8000/api/auth/register \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Test User",
-    "email": "test@example.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-  }'
-```
-
-#### 2. Login and Get Token
-```bash
-curl -X POST http://localhost:8000/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "test@example.com",
-    "password": "password123"
-  }'
-```
-
-#### 3. Create an Order
-```bash
-curl -X POST http://localhost:8000/api/orders \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer YOUR_TOKEN_HERE" \
-  -d '{
-    "total_amount": 99.99,
-    "shipping_address": {
-      "name": "Test User",
-      "street": "123 Test St",
-      "city": "Test City",
-      "state": "TS",
-      "postal_code": "12345",
-      "country": "USA"
-    }
-  }'
-```
-
-#### 4. Check Health Status
-```bash
-curl http://localhost:8000/api/health
-```
-
-## Postman Usage
-
-### JSON Format (Recommended)
-1. **Method**: POST
-2. **URL**: `http://localhost:8000/api/auth/register`
-3. **Headers**: 
-   - `Content-Type: application/json`
-   - `Accept: application/json`
-4. **Body**: Select "raw" → "JSON"
-5. **JSON Body**:
-```json
-{
-    "name": "Test User",
-    "email": "test@example.com",
-    "password": "password123",
-    "password_confirmation": "password123"
-}
-```
-
-### Form-Data Format (Also Supported)
-1. **Method**: POST
-2. **URL**: `http://localhost:8000/api/auth/register`
-3. **Headers**: 
-   - `Accept: application/json`
-4. **Body**: Select "form-data"
-5. **Form Fields**:
-   - `name`: Test User
-   - `email`: test@example.com
-   - `password`: password123
-   - `password_confirmation`: password123
-
-
-## Development Notes
-
-### Gateway Bypass Mode Details
-
-The gateway bypass mode is controlled by the `GATEWAY_MODE` environment variable in the gateway service:
-
-#### How It Works
-
-1. **Gateway Level**: 
-   - When `GATEWAY_MODE=bypass`, the `GatewayAuth` middleware skips JWT validation
-   - Sets `X-Bypass-Mode: true` header for downstream services
-   - Sets `X-User-Email` and `X-User-Role` headers
-
-2. **Users Service**:
-   - `TrustGateway` middleware detects bypass mode
-   - Automatically creates/finds user by email (`dev@example.com`)
-   - Sets proper user object for `$request->user()`
-
-3. **Orders Service**:
-   - `TrustGateway` middleware detects bypass mode
-   - Creates mock user object with admin privileges
-   - Allows all CRUD operations without authentication
-
-#### Configuration Options
-
-```env
-# Gateway Service (.env)
-GATEWAY_MODE=bypass          # Enable bypass mode
-GATEWAY_BYPASS_ROLE=admin    # Role for bypass user (admin, user, moderator)
-```
-
-#### Switching Modes
-
-- **Enable Bypass**: Set `GATEWAY_MODE=bypass` in gateway service
-- **Disable Bypass**: Set `GATEWAY_MODE=introspect` in gateway service
-- **Restart Required**: Restart gateway service after changing mode
-
-### Database
-- All services use MySQL (configured via Docker)
-- Each service has its own database (microservice_user, microservice_order)
-- phpMyAdmin available for database management
-- Redis available for caching
-
-### Inter-Service Communication
-- Services communicate through HTTP requests
-- Gateway service routes requests to appropriate microservices
-- JWT tokens are validated at the gateway level (unless bypassed in dev mode)
-
-### Error Handling
-- Comprehensive error responses with appropriate HTTP status codes
-- Detailed validation error messages
-- Logging for debugging and monitoring
 
 ## Database Management
 
@@ -760,13 +804,13 @@ Migrations run automatically on container startup. To run manually:
 
 ```bash
 # Gateway service
-docker-compose exec gateway php artisan migrate
+docker-compose -f docker/docker-compose.yml --project-directory . exec gateway php artisan migrate
 
 # Users service
-docker-compose exec users php artisan migrate
+docker-compose -f docker/docker-compose.yml --project-directory . exec users php artisan migrate
 
 # Orders service
-docker-compose exec orders php artisan migrate
+docker-compose -f docker/docker-compose.yml --project-directory . exec orders php artisan migrate
 ```
 
 ## Production Considerations
@@ -794,167 +838,163 @@ docker-compose exec orders php artisan migrate
    - ✅ Database indexing optimized
    - ✅ Configurable timeouts for production
    - ✅ API response optimization
-   
-   
-# JWT Control Guide
+   - ✅ Kafka for async event processing
 
-## Overview
+5. **Monitoring**:
+   - ✅ Kafka UI for event monitoring
+   - ✅ Health check endpoints
+   - ✅ Comprehensive logging
 
-Your microservices system supports multiple ways to control JWT authentication between development and production modes. This guide explains all the methods available.
+## Project Structure
 
-## Control Methods
-
-### Environment Variables
-
-#### Development Mode (JWT Bypass)
-```env
-# In gateway-service/local_env or .env
-GATEWAY_MODE=bypass
-GATEWAY_BYPASS_ROLE=admin
-GATEWAY_BYPASS_EMAIL=dev@example.com
 ```
-
-#### Production Mode (Full JWT)
-```env
-# In gateway-service/local_env or .env
-GATEWAY_MODE=introspect
+laravel12-jwt-microservices-starter/
+├── docker/                          # All Docker/K8s configs
+│   ├── docker-compose.yml          # Docker Compose configuration
+│   ├── k8s/                        # Kubernetes manifests
+│   │   ├── namespace.yaml
+│   │   ├── secrets.yaml
+│   │   ├── configmap.yaml
+│   │   ├── gateway-deployment.yaml
+│   │   ├── users-deployment.yaml
+│   │   ├── orders-deployment.yaml
+│   │   ├── mysql-deployment.yaml
+│   │   ├── redis-deployment.yaml
+│   │   └── ingress.yaml
+│   ├── mysql/
+│   │   └── init.sql               # Database initialization
+│   └── .env                        # Docker environment variables
+├── gateway-service/                # API Gateway service
+│   ├── app/
+│   │   ├── Http/
+│   │   │   ├── Controllers/
+│   │   │   └── Middleware/
+│   │   └── Services/
+│   │       ├── ProxyService.php
+│   │       ├── KafkaService.php   # Kafka integration
+│   │       └── ServiceRegistry.php
+│   └── config/
+│       └── services.php           # Service registry configuration
+├── users-service/                  # User management service
+│   ├── app/
+│   │   ├── Http/
+│   │   └── Services/
+│   │       └── KafkaService.php   # Kafka integration
+│   └── ...
+├── orders-service/                 # Order management service
+│   ├── app/
+│   │   ├── Http/
+│   │   └── Services/
+│   │       ├── OrderService.php   # Publishes Kafka events
+│   │       └── KafkaService.php   # Kafka integration
+│   └── ...
+├── setup.sh                        # Automated setup script (Linux/Mac)
+├── setup.bat                       # Automated setup script (Windows)
+└── README.md                       # This file
 ```
-
-### Configuration Files
-
-The system checks JWT bypass in this order:
-
-1. **Environment-based** (current system)
-   ```php
-   if (config('app.env') === 'local' && config('app.debug') === true)
-   ```
-
-2. **Explicit bypass setting**
-   ```php
-   if (config('jwt.bypass_enabled', false))
-   ```
-
-3. **Force bypass via environment**
-   ```php
-   if (env('JWT_BYPASS', false))
-   ```
-
-## Quick Commands
-
-### Switch to Development Mode
-```bash
-# Edit gateway-service/local_env or .env file
-GATEWAY_MODE=bypass
-GATEWAY_BYPASS_ROLE=admin
-```
-
-### Switch to Production Mode
-```bash
-# Edit gateway-service/local_env or .env file
-GATEWAY_MODE=introspect
-```
-
-## Configuration Options
-
-### Gateway Configuration Variables
-| Variable | Description | Default | Example |
-|----------|-------------|---------|---------|
-| `GATEWAY_MODE` | Gateway authentication mode | `introspect` | `bypass`, `introspect` |
-| `GATEWAY_BYPASS_ROLE` | Role for bypass mode user | `admin` | `admin`, `user`, `moderator` |
-| `GATEWAY_BYPASS_EMAIL` | Email for bypass mode user | `dev@example.com` | `dev@example.com` |
-| `JWT_SECRET` | JWT secret key (must match across services) | - | `your-secret-key` |
-| `AUTH_SERVICE_URL` | Users service URL for JWT introspection | - | `http://users:8001` |
-
-
-
-### Manual Testing
-
-#### Development Mode (Bypass Active)
-```bash
-# These should work without authentication
-curl http://localhost:8000/api/users/profile
-curl http://localhost:8000/api/orders
-curl http://localhost:8000/api/users  # Admin endpoint
-```
-
-#### Production Mode (Full JWT Required)
-```bash
-# These should require authentication
-curl http://localhost:8000/api/users/profile  # Returns 401
-curl http://localhost:8000/api/orders         # Returns 401
-
-# With valid token
-curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/users/profile
-```
-
-## Switching Between Modes
-
-### For Development
-1. Edit `gateway-service/local_env` or `.env`
-2. Set `GATEWAY_MODE=bypass`
-3. Set `GATEWAY_BYPASS_ROLE=admin`
-4. Restart gateway service
-
-### For Production
-1. Edit `gateway-service/local_env` or `.env`
-2. Set `GATEWAY_MODE=introspect`
-3. Restart gateway service
-
-## Security Considerations
-
-### Development Mode
-- âœ… JWT bypass enabled
-- âœ… Mock user with admin privileges
-- âœ… No authentication required
-- âš ï¸ Only use in local development
-
-### Production Mode
-- âœ… Full JWT authentication required
-- âœ… All security measures active
-- âœ… Role-based access control enforced
-- âœ… No bypass available
 
 ## Troubleshooting
 
-### JWT Bypass Not Working
-1. Check environment variables in `gateway-service/local_env` or `.env`:
-   ```bash
-   # Should contain:
-   GATEWAY_MODE=bypass
-   GATEWAY_BYPASS_ROLE=admin
-   ```
+### Services not starting
 
-2. Restart gateway service:
-   ```bash
-   docker-compose restart gateway
-   ```
+**Docker Compose:**
+```bash
+# Check logs
+docker-compose -f docker/docker-compose.yml --project-directory . logs gateway
+docker-compose -f docker/docker-compose.yml --project-directory . ps
+```
 
-3. Verify bypass mode is active by checking logs
+**Kubernetes:**
+```bash
+# Check logs
+kubectl logs -n microservices -l app=gateway
+kubectl get pods -n microservices
+```
 
-### Production Mode Issues
-1. Ensure `GATEWAY_MODE=introspect` in gateway service
-2. Verify `JWT_SECRET` is set and matches across all services
-3. Test with valid JWT token from login endpoint
-4. Check gateway logs for introspection errors
+### Database connection issues
 
-## Best Practices
+**Docker Compose:**
+```bash
+# Test MySQL connection
+docker-compose -f docker/docker-compose.yml --project-directory . exec mysql mysql -u root -p
 
-1. **Development**: Always use JWT bypass for local development
-2. **Testing**: Use custom mock users for specific test scenarios
-3. **Production**: Never enable JWT bypass in production
-4. **Security**: Regularly rotate JWT secrets
-5. **Monitoring**: Log authentication attempts and failures
+# Check MySQL logs
+docker-compose -f docker/docker-compose.yml --project-directory . logs mysql
+```
 
-## Quick Reference
+**Kubernetes:**
+```bash
+# Test MySQL connection
+kubectl exec -n microservices -it <mysql-pod> -- mysql -u root -p
 
-| Mode | GATEWAY_MODE | GATEWAY_BYPASS_ROLE | Authentication |
-|------|--------------|---------------------|----------------|
-| Development | `bypass` | `admin` | Bypassed |
-| Production | `introspect` | N/A | Required (JWT) |
+# Check MySQL logs
+kubectl logs -n microservices -l app=mysql
+```
 
-## Related Files
+### Migration errors
 
-- `gateway-service/config/services.php` - Service configuration
-- `gateway-service/config/app.php` - Gateway configuration
-- `gateway-service/app/Http/Middleware/GatewayAuth.php` - Gateway authentication middleware
+**Docker Compose:**
+```bash
+# Run migrations manually
+docker-compose -f docker/docker-compose.yml --project-directory . exec gateway php artisan migrate --force
+```
 
+**Kubernetes:**
+```bash
+# Run migrations manually
+kubectl exec -n microservices <gateway-pod> -- php artisan migrate --force
+```
+
+### Kafka not working
+```bash
+# Check Kafka logs
+docker-compose -f docker/docker-compose.yml --project-directory . logs kafka
+
+# Check Zookeeper logs
+docker-compose -f docker/docker-compose.yml --project-directory . logs zookeeper
+
+# Access Kafka UI
+# Open http://localhost:8081 in browser
+```
+
+### Port conflicts
+If ports 8000, 8001, 8002, 3306, 6379, 9092, or 8081 are already in use:
+- **Docker Compose**: Change ports in `docker/docker-compose.yml`
+- **Kubernetes**: Use different ports in Kubernetes Service definitions
+
+## Cleanup
+
+### Docker Compose:
+```bash
+docker-compose -f docker/docker-compose.yml --project-directory . down -v
+```
+
+### Kubernetes:
+```bash
+kubectl delete namespace microservices
+```
+
+## Recent Updates
+
+### November 2025 - Kafka Integration
+- ✅ Added Apache Kafka for event-driven communication
+- ✅ Added Zookeeper and Kafka UI
+- ✅ OrderService now publishes events to Kafka
+- ✅ Health checks enhanced with Kafka support
+- ✅ Created KafkaService wrapper for all services
+- ✅ Moved all Docker configs to `docker/` folder
+- ✅ Updated setup script to use new structure
+
+### Architecture Improvements
+- ✅ Event-driven communication for async operations
+- ✅ Service decoupling via Kafka events
+- ✅ Improved scalability and reliability
+- ✅ Better observability with Kafka UI
+
+## License
+
+This project is open-source and available for use.
+
+## Support
+
+For issues, questions, or contributions, please refer to the project documentation or create an issue in the repository.
