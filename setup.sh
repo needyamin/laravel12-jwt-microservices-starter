@@ -486,23 +486,23 @@ case $action_choice in
         esac
         
         # Execute setup
-        case $DEPLOY_METHOD in
-            docker)
-                setup_docker
-                show_hosts_info
-                show_service_urls
-                ;;
-            k8s)
-                setup_k8s
-                show_hosts_info
-                show_service_urls
-                ;;
-            both)
-                setup_docker
-                echo ""
-                setup_k8s
-                show_hosts_info
-                show_service_urls
+case $DEPLOY_METHOD in
+    docker)
+        setup_docker
+        show_hosts_info
+        show_service_urls
+        ;;
+    k8s)
+        setup_k8s
+        show_hosts_info
+        show_service_urls
+        ;;
+    both)
+        setup_docker
+        echo ""
+        setup_k8s
+        show_hosts_info
+        show_service_urls
                 ;;
         esac
         ;;
@@ -525,15 +525,15 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "${BLUE}Next Steps:${NC}"
 if [ "$action_choice" = "1" ]; then
-    echo "1. Add the host entries shown above to your hosts file"
-    echo "2. Wait a few minutes for all services to be fully ready"
-    echo "3. Test the health endpoint: curl http://localhost:8000/api/health"
-    echo "4. Check service logs if needed:"
-    if [ "$DEPLOY_METHOD" = "docker" ] || [ "$DEPLOY_METHOD" = "both" ]; then
-        echo "   - docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . logs -f"
-    fi
-    if [ "$DEPLOY_METHOD" = "k8s" ] || [ "$DEPLOY_METHOD" = "both" ]; then
-        echo "   - kubectl logs -n microservices -l app=gateway -f"
+echo "1. Add the host entries shown above to your hosts file"
+echo "2. Wait a few minutes for all services to be fully ready"
+echo "3. Test the health endpoint: curl http://localhost:8000/api/health"
+echo "4. Check service logs if needed:"
+if [ "$DEPLOY_METHOD" = "docker" ] || [ "$DEPLOY_METHOD" = "both" ]; then
+    echo "   - docker-compose -f $DOCKER_COMPOSE_FILE --project-directory . logs -f"
+fi
+if [ "$DEPLOY_METHOD" = "k8s" ] || [ "$DEPLOY_METHOD" = "both" ]; then
+    echo "   - kubectl logs -n microservices -l app=gateway -f"
     fi
 else
     echo "1. Test the health endpoint: curl http://localhost:8000/api/health"
