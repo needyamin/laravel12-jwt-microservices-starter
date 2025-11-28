@@ -38,31 +38,57 @@ class ProxyService
         }
         unset($forwardHeaders['content-type']);
 
-        $options = [
-            'headers' => $forwardHeaders,
+        // Build HTTP request
+        $httpRequest = Http::withOptions([
             'timeout' => $this->getTimeout(),
             'connect_timeout' => $this->getConnectTimeout(),
-        ];
+        ])->withHeaders($forwardHeaders);
 
         if (in_array(strtoupper($request->method()), ['POST','PUT','PATCH'])) {
             $contentType = $request->header('Content-Type', '');
-            if (strpos($contentType, 'application/json') !== false) {
-                $options['json'] = $request->all();
-                $options['headers']['Content-Type'] = 'application/json';
-            } else if (strpos($contentType, 'multipart/form-data') !== false) {
-                $options['json'] = $request->all();
-                $options['headers']['Content-Type'] = 'application/json';
-            } else {
-                $options['form_params'] = $request->all();
-                if ($contentType) {
-                    $options['headers']['Content-Type'] = $contentType;
+            
+            if (strpos($contentType, 'multipart/form-data') !== false) {
+                // Handle multipart/form-data (file uploads)
+                // First, attach all files
+                foreach ($request->allFiles() as $key => $file) {
+                    if (is_array($file)) {
+                        // Handle multiple files with same key
+                        foreach ($file as $f) {
+                            $httpRequest = $httpRequest->attach(
+                                $key . '[]',
+                                file_get_contents($f->getRealPath()),
+                                $f->getClientOriginalName()
+                            );
+                        }
+                    } else {
+                        $httpRequest = $httpRequest->attach(
+                            $key,
+                            file_get_contents($file->getRealPath()),
+                            $file->getClientOriginalName()
+                        );
+                    }
                 }
+                // Then attach all non-file form fields
+                foreach ($request->except(array_keys($request->allFiles())) as $key => $value) {
+                    if (!is_null($value) && $value !== '') {
+                        $httpRequest = $httpRequest->attach(
+                            $key,
+                            is_array($value) ? json_encode($value) : (string) $value
+                        );
+                    }
+                }
+            } else if (strpos($contentType, 'application/json') !== false) {
+                $httpRequest = $httpRequest->withHeaders(['Content-Type' => 'application/json'])
+                    ->withBody($request->getContent(), 'application/json');
+            } else {
+                $httpRequest = $httpRequest->asForm();
             }
-            $options['headers']['Accept'] = 'application/json';
+            
+            $httpRequest = $httpRequest->withHeaders(['Accept' => 'application/json']);
         }
 
         try {
-            $response = Http::withOptions($options)->$method($url);
+            $response = $httpRequest->$method($url);
             
             // Log slow requests in production
             if (config('app.env') === 'production') {

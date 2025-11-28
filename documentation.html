@@ -69,6 +69,12 @@
             background: rgba(255,255,255,0.1);
         }
         
+        nav a.active {
+            background: rgba(102, 126, 234, 0.8);
+            color: white;
+            font-weight: 600;
+        }
+        
         .content {
             padding: 2rem;
         }
@@ -254,6 +260,8 @@
         <nav>
             <ul>
                 <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#api">API Endpoints</a></li>
+                <li><a href="#frontend">Frontend</a></li>
                 <li><a href="#structure">Structure Improvements</a></li>
                 <li><a href="#kafka">Apache Kafka</a></li>
                 <li><a href="#environment">Environment Configuration</a></li>
@@ -301,8 +309,11 @@
                 
                 <h4>Current Services</h4>
                 <ul>
-                    <li><strong>Users Service</strong> (Port 8001): User management and authentication</li>
+                    <li><strong>Users Service</strong> (Port 8001): User management and JWT authentication</li>
                     <li><strong>Orders Service</strong> (Port 8002): Order management</li>
+                    <li><strong>Products Service</strong> (Port 8003): Product catalog management</li>
+                    <li><strong>Carts Service</strong> (Port 8004): Shopping cart management</li>
+                    <li><strong>Payments Service</strong> (Port 8005): Payment processing</li>
                 </ul>
                 
                 <h2>Service Registration System</h2>
@@ -471,10 +482,16 @@ php artisan gateway:service {name}</code></pre>
                 
                 <h2>Current Infrastructure</h2>
                 <ul>
+                    <li>✅ 5 Microservices: Users, Orders, Products, Carts, Payments</li>
                     <li>✅ Apache Kafka for event-driven communication</li>
                     <li>✅ Kafka UI for monitoring and debugging</li>
                     <li>✅ Hybrid health checks (Kafka + HTTP fallback)</li>
                     <li>✅ Event publishing for async operations</li>
+                    <li>✅ Next.js Frontend with modern UI/UX</li>
+                    <li>✅ SweetAlert2 for enhanced user notifications</li>
+                    <li>✅ Complete eCommerce functionality</li>
+                    <li>✅ Database seeding with test data</li>
+                    <li>✅ Automated setup script with multiple options</li>
                 </ul>
                 
                 <h2>Future Enhancements</h2>
@@ -489,6 +506,399 @@ php artisan gateway:service {name}</code></pre>
                     <li>GraphQL gateway support</li>
                     <li>WebSocket support</li>
                     <li>Kafka queue driver for Laravel queues</li>
+                </ul>
+            </section>
+            
+            <!-- API Endpoints Section -->
+            <section id="api">
+                <h1>API Endpoints</h1>
+                
+                <div class="alert alert-info">
+                    <strong>📍 Base URL:</strong> All API endpoints are accessed through the Gateway at <code>http://localhost:8000/api</code>
+                </div>
+                
+                <h2>Authentication</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/auth/register</code></td>
+                            <td>Public</td>
+                            <td>Register new user</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/auth/login</code></td>
+                            <td>Public</td>
+                            <td>Login user</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/auth/refresh</code></td>
+                            <td>Public</td>
+                            <td>Refresh JWT token</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/auth/logout</code></td>
+                            <td>Public</td>
+                            <td>Logout user</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Users</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/users/profile</code></td>
+                            <td>Required</td>
+                            <td>Get current user profile</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/users/profile</code></td>
+                            <td>Required</td>
+                            <td>Update current user profile</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/users</code></td>
+                            <td>Admin</td>
+                            <td>List all users</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/users/{id}</code></td>
+                            <td>Admin</td>
+                            <td>Get user by ID</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/users/{id}</code></td>
+                            <td>Admin</td>
+                            <td>Update user</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">DELETE</span></td>
+                            <td><code>/api/users/{id}</code></td>
+                            <td>Admin</td>
+                            <td>Delete user</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Products</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/products</code></td>
+                            <td>Public</td>
+                            <td>List products (supports: category, status, search, min_price, max_price)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/products/{id}</code></td>
+                            <td>Public</td>
+                            <td>Get product details</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/products</code></td>
+                            <td>Required</td>
+                            <td>Create new product</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/products/{id}</code></td>
+                            <td>Required</td>
+                            <td>Update product</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">DELETE</span></td>
+                            <td><code>/api/products/{id}</code></td>
+                            <td>Required</td>
+                            <td>Delete product</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Carts</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/carts</code></td>
+                            <td>Required</td>
+                            <td>Get user's cart</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/carts/items</code></td>
+                            <td>Required</td>
+                            <td>Add item to cart</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/carts/items/{itemId}</code></td>
+                            <td>Required</td>
+                            <td>Update cart item quantity</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">DELETE</span></td>
+                            <td><code>/api/carts/items/{itemId}</code></td>
+                            <td>Required</td>
+                            <td>Remove item from cart</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">DELETE</span></td>
+                            <td><code>/api/carts</code></td>
+                            <td>Required</td>
+                            <td>Clear entire cart</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Orders</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/orders</code></td>
+                            <td>Required</td>
+                            <td>Get user's orders</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/orders</code></td>
+                            <td>Required</td>
+                            <td>Create new order</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/orders/{id}</code></td>
+                            <td>Required</td>
+                            <td>Get order details</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/orders/{id}</code></td>
+                            <td>Required</td>
+                            <td>Update order</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">DELETE</span></td>
+                            <td><code>/api/orders/{id}</code></td>
+                            <td>Required</td>
+                            <td>Cancel order</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/orders/admin/all</code></td>
+                            <td>Moderator+</td>
+                            <td>Get all orders (admin)</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/orders/{id}/status</code></td>
+                            <td>Moderator+</td>
+                            <td>Update order status</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Payments</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/payments</code></td>
+                            <td>Required</td>
+                            <td>Get user's payments</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">POST</span></td>
+                            <td><code>/api/payments</code></td>
+                            <td>Required</td>
+                            <td>Create payment</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/payments/{id}</code></td>
+                            <td>Required</td>
+                            <td>Get payment details</td>
+                        </tr>
+                        <tr>
+                            <td><span class="badge badge-info">PUT</span></td>
+                            <td><code>/api/payments/{id}/status</code></td>
+                            <td>Required</td>
+                            <td>Update payment status</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Health Check</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Endpoint</th>
+                            <th>Auth</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="badge badge-info">GET</span></td>
+                            <td><code>/api/health</code></td>
+                            <td>Public</td>
+                            <td>Check gateway and all services health status</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h2>Authentication</h2>
+                <p>For authenticated endpoints, include the JWT token in the Authorization header:</p>
+                <pre><code>Authorization: Bearer {your-jwt-token}</code></pre>
+                
+                <h2>Response Format</h2>
+                <p>All API responses follow a consistent format:</p>
+                <pre><code>// Success Response
+{
+    "data": { ... },
+    "message": "Success message"
+}
+
+// Error Response
+{
+    "error": "Error message",
+    "errors": { ... }  // Validation errors
+}</code></pre>
+                
+                <h2>Quick Links</h2>
+                <ul>
+                    <li><strong>Gateway URL:</strong> <code>http://localhost:8000</code></li>
+                    <li><strong>API Base:</strong> <code>http://localhost:8000/api</code></li>
+                    <li><strong>Health Check:</strong> <code>http://localhost:8000/api/health</code></li>
+                    <li><strong>Frontend:</strong> <code>http://localhost:3000</code></li>
+                </ul>
+            </section>
+            
+            <!-- Frontend Section -->
+            <section id="frontend">
+                <h1>Frontend Application</h1>
+                
+                <h2>Overview</h2>
+                <p>The project includes a modern Next.js frontend application with beautiful UI/UX, built with React 19, TypeScript, and TailwindCSS.</p>
+                
+                <h2>Technology Stack</h2>
+                <ul>
+                    <li><strong>Next.js 16</strong> - React framework with App Router</li>
+                    <li><strong>React 19</strong> - UI library</li>
+                    <li><strong>TypeScript</strong> - Type safety</li>
+                    <li><strong>TailwindCSS 4</strong> - Utility-first CSS framework</li>
+                    <li><strong>SweetAlert2</strong> - Beautiful alert dialogs</li>
+                </ul>
+                
+                <h2>Features</h2>
+                
+                <h3>Pages</h3>
+                <ul>
+                    <li>🏠 <strong>Home</strong> - Product catalog with search and filters</li>
+                    <li>🔐 <strong>Authentication</strong> - Login and Registration</li>
+                    <li>🛍️ <strong>Products</strong> - Product listing and detail pages</li>
+                    <li>🛒 <strong>Shopping Cart</strong> - Cart management</li>
+                    <li>💳 <strong>Checkout</strong> - Complete checkout process</li>
+                    <li>📦 <strong>Orders</strong> - Order history and details</li>
+                    <li>👤 <strong>Profile</strong> - User profile management</li>
+                </ul>
+                
+                <h3>UI/UX Features</h3>
+                <ul>
+                    <li>✨ Modern design with gradients and animations</li>
+                    <li>🎨 SweetAlert2 notifications (replaces browser alerts)</li>
+                    <li>⚡ Loading states with spinners</li>
+                    <li>🎯 Confirmation dialogs for destructive actions</li>
+                    <li>📱 Fully responsive design</li>
+                    <li>🎭 Error boundaries for graceful error handling</li>
+                    <li>🔄 Real-time cart updates</li>
+                    <li>💰 Price formatting with currency support</li>
+                </ul>
+                
+                <h2>Setup</h2>
+                <pre><code>cd frontend
+npm install
+npm run dev</code></pre>
+                <p>The frontend will be available at <code>http://localhost:3000</code></p>
+                
+                <h2>API Integration</h2>
+                <p>The frontend communicates with the backend through the API Gateway at <code>http://localhost:8000/api</code>. All API calls are handled through a centralized API client with proper error handling and authentication.</p>
+                
+                <h2>Authentication Flow</h2>
+                <ol>
+                    <li>User logs in via <code>/api/auth/login</code></li>
+                    <li>JWT token is stored in localStorage</li>
+                    <li>Token is automatically included in all authenticated requests</li>
+                    <li>Token is refreshed automatically when needed</li>
+                </ol>
+                
+                <h2>Key Components</h2>
+                <ul>
+                    <li><code>AuthContext</code> - Authentication state management</li>
+                    <li><code>ErrorBoundary</code> - Catches and displays errors gracefully</li>
+                    <li><code>ProductCard</code> - Reusable product display component</li>
+                    <li><code>Header</code> - Navigation header</li>
+                    <li><code>Footer</code> - Site footer</li>
                 </ul>
             </section>
             
@@ -534,7 +944,7 @@ php artisan gateway:service {name}</code></pre>
                 <h3>3. Enhanced Services Configuration</h3>
                 <p><strong>Updated</strong>: <code>gateway-service/config/services.php</code></p>
                 <ul>
-                    <li>Structured service definitions</li>
+                    <li>Structured service definitions for all 5 services</li>
                     <li>Route definitions with middleware</li>
                     <li>Health check endpoints</li>
                     <li>Service descriptions</li>
@@ -563,6 +973,24 @@ php artisan gateway:service {name}</code></pre>
                     <li><code>php artisan gateway:service {name}</code> - Show service details</li>
                 </ul>
                 
+                <h3>7. Database Seeding</h3>
+                <p><strong>New</strong>: All services now have database seeders</p>
+                <ul>
+                    <li>Test users with different roles</li>
+                    <li>Sample products across categories</li>
+                    <li>Sample orders with various statuses</li>
+                    <li>Sample carts with items</li>
+                    <li>Sample payment records</li>
+                </ul>
+                
+                <h3>8. Unified Setup Script</h3>
+                <p><strong>Updated</strong>: <code>setup.sh</code> now includes all setup operations</p>
+                <ul>
+                    <li>Full setup option (Docker + migrations + seeding)</li>
+                    <li>Database fixing option (recreate databases + migrations + seeding)</li>
+                    <li>Database seeding option (seed all services with test data)</li>
+                </ul>
+                
                 <h2>Benefits</h2>
                 
                 <h3>Before (Old Structure)</h3>
@@ -583,17 +1011,21 @@ php artisan gateway:service {name}</code></pre>
                     <li><strong>Done!</strong> Routes are auto-registered</li>
                 </ol>
                 
-                <h2>Example: Adding a "Products" Service</h2>
+                <div class="alert alert-success">
+                    <strong>✅ All Services Already Configured:</strong> Products, Carts, and Payments services are already fully configured and working!
+                </div>
+                
+                <h2>Example: Adding a New Service</h2>
                 
                 <h3>Step 1: Add to <code>config/services.php</code></h3>
-                <pre><code>'products' => [
-    'url' => env('PRODUCTS_SERVICE_URL', 'http://localhost:8003'),
+                <pre><code>'new-service' => [
+    'url' => env('NEW_SERVICE_URL', 'http://localhost:8006'),
     'health_endpoint' => '/api/health',
-    'description' => 'Product catalog service',
+    'description' => 'New service description',
     'routes' => [
         [
-            'path' => 'products',
-            'service_path' => 'api/products',
+            'path' => 'new-service',
+            'service_path' => 'api/',
             'methods' => ['GET', 'POST'],
             'middleware' => ['gateway.auth'],
         ],
@@ -602,7 +1034,7 @@ php artisan gateway:service {name}</code></pre>
 ],</code></pre>
                 
                 <h3>Step 2: Add to <code>.env</code></h3>
-                <pre><code>PRODUCTS_SERVICE_URL=http://localhost:8003</code></pre>
+                <pre><code>NEW_SERVICE_URL=http://localhost:8006</code></pre>
                 
                 <h3>Step 3: Done!</h3>
                 <p>The gateway automatically:</p>
@@ -664,12 +1096,20 @@ curl http://localhost:8000/api/health</code></pre>
                 
                 <h2>Quick Start</h2>
                 <ol>
-                    <li>Run <code>bash setup.sh</code> (or <code>setup.sh</code> on Linux/Mac) - it automatically:
+                    <li>Run <code>./setup.sh</code> (Linux/Mac/Windows Git Bash) - it provides three options:
+                        <ul>
+                            <li><strong>Option 1 - Full Setup:</strong> Complete Docker/K8s deployment with migrations and seeding</li>
+                            <li><strong>Option 2 - Fix Databases:</strong> Recreate databases, run migrations, and seed data</li>
+                            <li><strong>Option 3 - Seed All Databases:</strong> Seed all microservices with test data</li>
+                        </ul>
+                    </li>
+                    <li>The script automatically:
                         <ul>
                             <li>Creates <code>docker/.env</code> with default values</li>
                             <li>Builds Docker images</li>
-                            <li>Starts all services (including Kafka)</li>
-                            <li>Runs database migrations</li>
+                            <li>Starts all services (including Kafka, MySQL, Redis)</li>
+                            <li>Runs database migrations for all services</li>
+                            <li>Seeds databases with test data</li>
                         </ul>
                     </li>
                     <li>For Docker: Environment variables are set in <code>docker/docker-compose.yml</code> (references <code>docker/.env</code>)</li>
@@ -680,10 +1120,38 @@ curl http://localhost:8000/api/health</code></pre>
                     <strong>✅ Automated Setup:</strong> The <code>setup.sh</code> script handles everything automatically. No manual configuration needed for Docker deployment!
                 </div>
                 
+                <div class="alert alert-info">
+                    <strong>📊 Test Data:</strong> The setup script automatically seeds all databases with test data including users, products, orders, carts, and payments for easy testing.
+                </div>
+                
                 <h2>Docker Environment Configuration</h2>
+                
+                <div class="alert alert-success">
+                    <strong>✅ New Structure:</strong> All services now use <code>.production_env</code> files for Docker deployment. Environment variables are no longer hardcoded in <code>docker-compose.yml</code>.
+                </div>
+                
+                <h3>Production Environment Files</h3>
+                <p>Each service has a <code>.production_env</code> file that contains all production settings:</p>
+                <ul>
+                    <li><code>gateway-service/.production_env</code> - Gateway service configuration</li>
+                    <li><code>users-service/.production_env</code> - Users service configuration</li>
+                    <li><code>orders-service/.production_env</code> - Orders service configuration</li>
+                    <li><code>product-service/.production_env</code> - Product service configuration</li>
+                    <li><code>cart-service/.production_env</code> - Cart service configuration</li>
+                    <li><code>payment-service/.production_env</code> - Payment service configuration</li>
+                </ul>
+                
+                <p><strong>Benefits:</strong></p>
+                <ul>
+                    <li>✅ All settings centralized in one file per service</li>
+                    <li>✅ No hardcoded values in docker-compose.yml</li>
+                    <li>✅ Easier to manage and update</li>
+                    <li>✅ Cleaner docker-compose.yml file</li>
+                </ul>
                 
                 <h3>Docker Compose Environment File</h3>
                 <p><strong>File</strong>: <code>docker/.env</code> (created automatically by <code>setup.sh</code>)</p>
+                <p>This file is used for Docker Compose-specific variables (MySQL passwords, JWT secrets, etc.):</p>
                 <pre><code># Application Environment
 APP_ENV=production
 APP_DEBUG=false
@@ -702,7 +1170,7 @@ GATEWAY_MODE=introspect
 GATEWAY_BYPASS_ROLE=admin
 GATEWAY_BYPASS_EMAIL=dev@example.com</code></pre>
                 
-                <p><strong>Note:</strong> When running in Docker, services get environment variables directly from <code>docker-compose.yml</code>, which can reference values from <code>docker/.env</code>.</p>
+                <p><strong>Note:</strong> Docker Compose uses <code>env_file</code> directive to load environment variables from <code>.production_env</code> files. The <code>docker/.env</code> file is only used for Docker Compose variable substitution.</p>
                 
                 <h2>Local Development Environment Variables</h2>
                 
@@ -793,13 +1261,19 @@ DB_PASSWORD=your-password</code></pre>
                 <p>All service URLs are configured in:</p>
                 <ul>
                     <li><code>gateway-service/config/services.php</code> - Uses env variables</li>
-                    <li><code>docker/docker-compose.yml</code> - Docker environment variables</li>
-                    <li><code>docker/.env</code> - Docker Compose environment file (created by setup.sh)</li>
-                    <li>Individual service <code>.env</code> files - For local development only</li>
+                    <li><code>docker/docker-compose.yml</code> - Uses <code>env_file</code> to load from <code>.production_env</code> files</li>
+                    <li><code>docker/.env</code> - Docker Compose environment file (created by setup.sh) - for MySQL, JWT secrets, etc.</li>
+                    <li><code>service-name/.production_env</code> - Production environment variables for each service (used by Docker)</li>
+                    <li><code>service-name/local_env</code> - Local development template (copy to <code>.env</code> for local dev)</li>
                 </ul>
                 
-                <div class="alert alert-warning">
-                    <strong>⚠️ Important:</strong> When running in Docker, services do NOT use <code>.env</code> files in service directories. All environment variables come from <code>docker-compose.yml</code>.
+                <div class="alert alert-info">
+                    <strong>📝 Environment File Structure:</strong>
+                    <ul>
+                        <li><strong>Docker/Production:</strong> Uses <code>.production_env</code> files (loaded via <code>env_file</code> in docker-compose.yml)</li>
+                        <li><strong>Local Development:</strong> Copy <code>local_env</code> to <code>.env</code> in each service directory</li>
+                        <li><strong>Docker Compose Variables:</strong> <code>docker/.env</code> for MySQL passwords, JWT secrets, etc.</li>
+                    </ul>
                 </div>
                 
                 <h2>Testing with Custom URLs</h2>
@@ -812,20 +1286,23 @@ export ORDERS_SERVICE_URL=http://192.168.1.100:8002
 # Or update local_env files directly</code></pre>
                 
                 <h2>Docker/Container Configuration</h2>
-                <p>For containerized deployments, environment variables are configured in <code>docker/docker-compose.yml</code>:</p>
+                <p>For containerized deployments, environment variables are loaded from <code>.production_env</code> files:</p>
                 <pre><code># docker/docker-compose.yml
 services:
   gateway:
-    environment:
-      - APP_ENV=${APP_ENV:-production}
-      - GATEWAY_URL=http://gateway:8000
-      - USERS_SERVICE_URL=http://users:8001
-      - ORDERS_SERVICE_URL=http://orders:8002
-      - KAFKA_BROKERS=kafka:29092
-      - JWT_SECRET=${JWT_SECRET:-your-secret-key-change-this-in-production}
-      # ... more variables</code></pre>
+    env_file:
+      - ./gateway-service/.production_env
+    # No hardcoded environment variables!
+    
+  users:
+    env_file:
+      - ./users-service/.production_env
+      
+  orders:
+    env_file:
+      - ./orders-service/.production_env</code></pre>
                 
-                <p><strong>Important:</strong> Variables with <code>${VAR:-default}</code> syntax read from <code>docker/.env</code> file.</p>
+                <p><strong>Important:</strong> All environment variables are now in <code>.production_env</code> files. The <code>docker/.env</code> file is only used for Docker Compose variable substitution (MySQL passwords, etc.).</p>
                 
                 <h2>Network Configuration</h2>
                 
@@ -836,6 +1313,9 @@ services:
                     <li><strong>Gateway:</strong> http://localhost:8000</li>
                     <li><strong>Users Service:</strong> http://localhost:8001</li>
                     <li><strong>Orders Service:</strong> http://localhost:8002</li>
+                    <li><strong>Product Service:</strong> http://localhost:8003</li>
+                    <li><strong>Cart Service:</strong> http://localhost:8004</li>
+                    <li><strong>Payment Service:</strong> http://localhost:8005</li>
                     <li><strong>MySQL:</strong> localhost:3306</li>
                     <li><strong>Redis:</strong> localhost:6379</li>
                     <li><strong>Kafka:</strong> localhost:9092</li>
@@ -1287,8 +1767,77 @@ ServiceRegistry::register('new-service', [
         <footer>
             <p>&copy; 2025 Laravel 12 JWT Microservices Starter. All rights reserved.</p>
             <p>Complete documentation for microservices architecture, configuration, and service management.</p>
-            <p><strong>Last Updated:</strong> November 2025 - Added Apache Kafka integration, Docker reorganization</p>
+            <p><strong>Last Updated:</strong> January 2025 - Updated with all 5 microservices (Users, Orders, Products, Carts, Payments), database seeding, unified setup script, Next.js frontend with SweetAlert2, and complete API documentation</p>
         </footer>
     </div>
+    
+    <script>
+        // Active navigation highlighting based on scroll position
+        (function() {
+            const navLinks = document.querySelectorAll('nav a');
+            const sections = document.querySelectorAll('section[id]');
+            
+            function updateActiveNav() {
+                let current = '';
+                const scrollY = window.pageYOffset || window.scrollY;
+                
+                // Find the current section based on scroll position
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop - 100; // Offset for sticky nav
+                    const sectionHeight = section.offsetHeight;
+                    const sectionId = section.getAttribute('id');
+                    
+                    if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
+                        current = sectionId;
+                    }
+                });
+                
+                // Update active class on nav links
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    const href = link.getAttribute('href');
+                    if (href === '#' + current) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+            
+            // Update on scroll
+            let ticking = false;
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    window.requestAnimationFrame(function() {
+                        updateActiveNav();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            });
+            
+            // Update on page load
+            updateActiveNav();
+            
+            // Update when clicking nav links (smooth scroll)
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    const targetSection = document.querySelector(targetId);
+                    
+                    if (targetSection) {
+                        const offsetTop = targetSection.offsetTop - 80; // Offset for sticky nav
+                        window.scrollTo({
+                            top: offsetTop,
+                            behavior: 'smooth'
+                        });
+                        
+                        // Update active state immediately
+                        navLinks.forEach(l => l.classList.remove('active'));
+                        this.classList.add('active');
+                    }
+                });
+            });
+        })();
+    </script>
 </body>
 </html>

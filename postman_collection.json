@@ -1,8 +1,8 @@
 {
 	"info": {
 		"_postman_id": "7ba810d6-232d-4362-a663-c6e9e1c73ba2",
-		"name": "Office Management ERP - Microservices API",
-		"description": "Complete API collection for Office Management ERP system with Gateway, Users Service, and Orders Service. Features JWT authentication, role-based access control, and comprehensive CRUD operations.",
+		"name": "eCommerce Platform - Microservices API",
+		"description": "Complete API collection for eCommerce platform with Gateway, Users/Auth, Products, Carts, Orders, and Payments services. Features JWT authentication, role-based access control, and comprehensive CRUD operations.",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "32341795"
 	},
@@ -557,6 +557,479 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Products Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{products_url}}/api/health",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Carts Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{carts_url}}/api/health",
+							"host": [
+								"{{carts_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Payments Service Health",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{payments_url}}/api/health",
+							"host": [
+								"{{payments_url}}"
+							],
+							"path": [
+								"api",
+								"health"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🛍️ Product Management",
+			"description": "Product catalog endpoints - public listing, authenticated management",
+			"item": [
+				{
+					"name": "List Products (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_url}}/api/products?category=Electronics&status=active",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							],
+							"query": [
+								{
+									"key": "category",
+									"value": "Electronics",
+									"description": "Filter by category"
+								},
+								{
+									"key": "status",
+									"value": "active",
+									"description": "Filter by status"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search in name, description, SKU",
+									"disabled": true
+								},
+								{
+									"key": "min_price",
+									"value": "",
+									"description": "Minimum price",
+									"disabled": true
+								},
+								{
+									"key": "max_price",
+									"value": "",
+									"description": "Maximum price",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Product (Public)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{gateway_url}}/api/products/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Product",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Laptop Pro 15\",\n    \"description\": \"High-performance laptop with 16GB RAM\",\n    \"sku\": \"LAPTOP-PRO-15\",\n    \"price\": 1299.99,\n    \"currency\": \"USD\",\n    \"stock_quantity\": 50,\n    \"category\": \"Electronics\",\n    \"image_url\": \"https://example.com/laptop.jpg\",\n    \"status\": \"active\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/products",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"products"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Product",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"price\": 1199.99,\n    \"stock_quantity\": 45\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/products/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Product",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/products/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"products",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🛒 Cart Management",
+			"description": "Shopping cart endpoints - authenticated users only",
+			"item": [
+				{
+					"name": "Get My Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/carts",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"carts"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Add Item to Cart",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"product_id\": 1,\n    \"quantity\": 2,\n    \"price\": 1299.99\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/carts/items",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"carts",
+								"items"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Cart Item",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"quantity\": 3\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/carts/items/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"carts",
+								"items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Item from Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/carts/items/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"carts",
+								"items",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Clear Cart",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/carts",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"carts"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💳 Payment Management",
+			"description": "Payment processing endpoints - authenticated users only",
+			"item": [
+				{
+					"name": "List My Payments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/payments",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 1,\n    \"payment_method\": \"credit_card\",\n    \"amount\": 199.98,\n    \"currency\": \"USD\",\n    \"transaction_id\": \"TXN-123456\"\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/payments",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"payments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							}
+						],
+						"url": {
+							"raw": "{{gateway_url}}/api/payments/1",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment Status",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"completed\",\n    \"transaction_id\": \"TXN-123456\",\n    \"gateway_response\": {\n        \"success\": true,\n        \"message\": \"Payment processed successfully\"\n    }\n}"
+						},
+						"url": {
+							"raw": "{{gateway_url}}/api/payments/1/status",
+							"host": [
+								"{{gateway_url}}"
+							],
+							"path": [
+								"api",
+								"payments",
+								"1",
+								"status"
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -621,6 +1094,47 @@
 					"response": []
 				},
 				{
+					"name": "Products Service - List Products",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{products_url}}/api/",
+							"host": [
+								"{{products_url}}"
+							],
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Carts Service - Get Cart",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Id",
+								"value": "1"
+							}
+						],
+						"url": {
+							"raw": "{{carts_url}}/api/",
+							"host": [
+								"{{carts_url}}"
+							],
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Orders Service - Create Order",
 					"request": {
 						"method": "POST",
@@ -650,6 +1164,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "Payments Service - Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Id",
+								"value": "1"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"order_id\": 1,\n    \"payment_method\": \"credit_card\",\n    \"amount\": 199.98,\n    \"currency\": \"USD\"\n}"
+						},
+						"url": {
+							"raw": "{{payments_url}}/api/",
+							"host": [
+								"{{payments_url}}"
+							],
+							"path": [
+								"api",
+								""
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		}
@@ -669,6 +1214,21 @@
 			"key": "orders_url",
 			"value": "http://127.0.0.1:8002",
 			"description": "Orders Service URL"
+		},
+		{
+			"key": "products_url",
+			"value": "http://127.0.0.1:8003",
+			"description": "Products Service URL"
+		},
+		{
+			"key": "carts_url",
+			"value": "http://127.0.0.1:8004",
+			"description": "Carts Service URL"
+		},
+		{
+			"key": "payments_url",
+			"value": "http://127.0.0.1:8005",
+			"description": "Payments Service URL"
 		},
 		{
 			"key": "token",

@@ -112,6 +112,104 @@ return [
                 ],
             ],
         ],
+
+        'products' => [
+            'url' => env('PRODUCTS_SERVICE_URL', 'http://127.0.0.1:8003'),
+            'health_endpoint' => env('PRODUCTS_HEALTH_ENDPOINT', '/api/health'),
+            'description' => 'Product catalog service',
+            'timeout' => env('PRODUCTS_SERVICE_TIMEOUT', 30),
+            'routes' => [
+                // Public product routes
+                [
+                    'path' => 'products',
+                    'service_path' => 'api/',
+                    'methods' => ['GET'],
+                    'middleware' => [],
+                ],
+                [
+                    'path' => 'products/{id}',
+                    'service_path' => 'api/{id}',
+                    'methods' => ['GET'],
+                    'middleware' => [],
+                ],
+                // Protected product management routes
+                [
+                    'path' => 'products',
+                    'service_path' => 'api/',
+                    'methods' => ['POST'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'products/{id}',
+                    'service_path' => 'api/{id}',
+                    'methods' => ['PUT', 'DELETE'],
+                    'middleware' => ['gateway.auth'],
+                ],
+            ],
+        ],
+
+        'carts' => [
+            'url' => env('CARTS_SERVICE_URL', 'http://127.0.0.1:8004'),
+            'health_endpoint' => env('CARTS_HEALTH_ENDPOINT', '/api/health'),
+            'description' => 'Shopping cart service',
+            'timeout' => env('CARTS_SERVICE_TIMEOUT', 30),
+            'routes' => [
+                // Cart routes (authenticated)
+                [
+                    'path' => 'carts',
+                    'service_path' => 'api/',
+                    'methods' => ['GET'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'carts/items',
+                    'service_path' => 'api/items',
+                    'methods' => ['POST'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'carts/items/{itemId}',
+                    'service_path' => 'api/items/{itemId}',
+                    'methods' => ['PUT', 'DELETE'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'carts',
+                    'service_path' => 'api/',
+                    'methods' => ['DELETE'],
+                    'middleware' => ['gateway.auth'],
+                ],
+            ],
+        ],
+
+        'payments' => [
+            'url' => env('PAYMENTS_SERVICE_URL', 'http://127.0.0.1:8005'),
+            'health_endpoint' => env('PAYMENTS_HEALTH_ENDPOINT', '/api/health'),
+            'description' => 'Payment processing service',
+            'timeout' => env('PAYMENTS_SERVICE_TIMEOUT', 30),
+            'routes' => [
+                // Payment routes (authenticated)
+                [
+                    'path' => 'payments',
+                    'service_path' => 'api/',
+                    'methods' => ['GET', 'POST'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'payments/{id}',
+                    'service_path' => 'api/{id}',
+                    'methods' => ['GET'],
+                    'middleware' => ['gateway.auth'],
+                ],
+                [
+                    'path' => 'payments/{id}/status',
+                    'service_path' => 'api/{id}/status',
+                    'methods' => ['PUT'],
+                    'middleware' => ['gateway.auth'],
+                ],
+            ],
+        ],
+
     ],
 
     /*

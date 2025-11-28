@@ -6,20 +6,37 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+!.production_env
 
 gateway-service/vendor/
 users-service/vendor/
 orders-service/vendor/
+contact-service/vendor/
 gateway-service/node_modules/
 users-service/node_modules/
 orders-service/node_modules/
+contact-service/node_modules/
 
 gateway-service/storage/framework/*
 users-service/storage/framework/*
 orders-service/storage/framework/*
+contact-service/storage/framework/*
 gateway-service/bootstrap/cache/*
 users-service/bootstrap/cache/*
 orders-service/bootstrap/cache/*
+contact-service/bootstrap/cache/*
+
+# Frontend (Next.js)
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/.vercel
+frontend/dist/
+frontend/.turbo
 
 !scripts/
 !stubs/
