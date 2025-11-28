@@ -8,23 +8,36 @@ Thumbs.db
 !.env.example
 !.production_env
 
+# Service vendor directories
 gateway-service/vendor/
 users-service/vendor/
 orders-service/vendor/
-contact-service/vendor/
+product-service/vendor/
+cart-service/vendor/
+payment-service/vendor/
+
+# Service node_modules
 gateway-service/node_modules/
 users-service/node_modules/
 orders-service/node_modules/
-contact-service/node_modules/
+product-service/node_modules/
+cart-service/node_modules/
+payment-service/node_modules/
 
+# Laravel storage and cache
 gateway-service/storage/framework/*
 users-service/storage/framework/*
 orders-service/storage/framework/*
-contact-service/storage/framework/*
+product-service/storage/framework/*
+cart-service/storage/framework/*
+payment-service/storage/framework/*
+
 gateway-service/bootstrap/cache/*
 users-service/bootstrap/cache/*
 orders-service/bootstrap/cache/*
-contact-service/bootstrap/cache/*
+product-service/bootstrap/cache/*
+cart-service/bootstrap/cache/*
+payment-service/bootstrap/cache/*
 
 # Frontend (Next.js)
 frontend/node_modules/
@@ -38,5 +51,24 @@ frontend/.vercel
 frontend/dist/
 frontend/.turbo
 
+# Docker
+docker/.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Keep important directories
 !scripts/
 !stubs/
